@@ -29,7 +29,7 @@
                         <img src="{{asset('imgs/avatars/1.png')}}" alt="avatar-01" class="avatar avatar-7">
                     </div> -->
                     <img src="{{asset('imgs/group-avatars.png')}}" alt="hero-img" class="group-avatars">
-                    <img src="{{asset('imgs/globe.gif')}}" alt="globe" class="globe">
+                    <img src="{{asset('imgs/updated-globe.gif')}}" alt="globe" class="globe">
                 </div>
             </div>
         </div>
