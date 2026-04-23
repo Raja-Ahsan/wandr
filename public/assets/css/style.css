@@ -104,6 +104,78 @@ a {
     padding: 180px 0 100px 0;
 }
 
+/* Hero grid + spotlights; stays under text, avatars, and globe */
+.hero.hero--atmospheric {
+    isolation: isolate;
+
+    background-image: radial-gradient(ellipse 120% 80% at 50% 0%, rgba(88, 28, 135, 0.35) 0%, transparent 55%);
+}
+
+.hero-atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(to right, rgba(167, 139, 250, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(167, 139, 250, 0.14) 1px, transparent 1px),
+        radial-gradient(ellipse 95% 85% at 0% -5%, rgba(223, 13, 120, 0.42) 0%, rgba(223, 13, 120, 0.12) 38%, transparent 62%),
+        radial-gradient(ellipse 95% 85% at 100% -5%, rgba(223, 13, 120, 0.42) 0%, rgba(223, 13, 120, 0.12) 38%, transparent 62%);
+    background-size: 52px 52px, 52px 52px, auto, auto;
+}
+
+.hero.hero--atmospheric > .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero.hero--atmospheric .purple-shade,
+.hero.hero--atmospheric .banner-shade-01 {
+    z-index: 1;
+}
+
+/* Globe above grid + shade overlays; below optional future overlays */
+.hero.hero--atmospheric .hero-globe-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.hero.hero--atmospheric .hero-content {
+    position: relative;
+    z-index: 4;
+}
+
+.hero.hero--atmospheric .group-avatars-wrapper {
+    position: relative;
+    z-index: 3;
+}
+
+.hero.hero--atmospheric .group-avatars {
+    position: relative;
+    z-index: 1;
+}
+
+.hero.hero--atmospheric .hero-globe-layer .globe {
+    position: absolute;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.ready-to-wandr-btns{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+
+}
 
 .sec-title {
     color: var(--default-color);
@@ -444,6 +516,13 @@ img {
     padding: 0 0 200px 0;
     background-color: #030016;
 }
+.ready-to-find-sec {
+    padding: 0 0 clamp(48px, 8vw, 100px);
+}
+.ready-to-find-right-content {
+    position: relative;
+    height: 100%;
+}
 .ready-to-find-inner {
     background-image: url('../../imgs/ready-to-find-bg.png');
     background-size: cover;
@@ -453,7 +532,7 @@ img {
 
 }
 .ready-to-find-inner .sec-title {
-    font-size: 48px;
+    font-size: clamp(28px, 4vw + 1rem, 48px);
     font-weight: 600;
     max-width: 680px;
 }
@@ -464,7 +543,9 @@ img {
     padding: 89px 0 89px 89px;
 }
 .ready-to-find-right-img {
-    max-width: 690px;
+    max-width: min(690px, 100%);
+    width: auto;
+    height: auto;
     position: absolute;
     right: 0;
     bottom: 0;
@@ -472,9 +553,12 @@ img {
 }
 .ready-to-find-logo-img {
     position: absolute;
-    top: 30px;
-    max-width: 380px;
-    right: 111px;
+    top: clamp(16px, 4vw, 30px);
+    max-width: min(380px, 42vw);
+    width: auto;
+    height: auto;
+    right: clamp(40px, 12vw, 111px);
+    z-index: 2;
 }
 .ready-to-find-inner {
     z-index: 1;
@@ -546,6 +630,10 @@ img {
     left: 0;
     right: 0;
 
+}
+
+.footer {
+    background-color: #18112B;
 }
 .footer-links-wrapper .footer-links-title {
     color: var(--default-color);
@@ -740,13 +828,14 @@ img {
     display: block;
     z-index: 1;
     background: var(--secondary-theme);
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     color: #fff;
     border-radius: 2px;
+    border-radius: 100%;
   }
 
   .close-icon i {
@@ -783,16 +872,246 @@ img {
   }
     /* mobile menu end */
 
+    /* Why Choose Wandr — stacked layout under 992px */
+    .why-choose-wandr-sec {
+        padding: 60px 0 80px;
+    }
+    .why-choose-wandr-sec .sec-title {
+        margin-bottom: 40px;
+    }
+    .why-choose-wandr-content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 100%;
+        padding: 0 12px;
+        gap: 16px;
+    }
+    .why-choose-wandr-gif-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        margin-left: auto;
+        margin-right: auto;
+        order: 3;
+    }
+    .why-choose-wandr-gif {
+        max-width: 100%;
+        height: auto;
+    }
+    .heart-pulse {
+        max-width: min(180px, 42vw);
+    }
+    .wcw-img {
+        display: none !important;
+    }
+    .wcw-card {
+        position: relative;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        left: auto;
+        margin: 0;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 16px 20px;
+        font-size: clamp(15px, 3.8vw, 18px);
+    }
+    .wcw-card--1 {
+        order: 1;
+    }
+    .wcw-card--2 {
+        order: 2;
+    }
+    .wcw-card--3 {
+        order: 4;
+    }
+    .wcw-card--4 {
+        order: 5;
+    }
+    .wcw-card--5 {
+        order: 6;
+    }
+
+    .sec-title {
+        font-size: 40px;
+    }
+
+    /* Ready to Find — stack layout, fluid type, no absolute overflow */
+    .ready-to-find-inner {
+        margin-top: clamp(-80px, -12vw, -40px);
+        border-radius: clamp(24px, 5vw, 40px);
+    }
+    .ready-to-find-inner::before {
+        border-radius: clamp(24px, 5vw, 40px);
+    }
+    .ready-to-find-content {
+        padding: clamp(28px, 5vw, 48px) clamp(16px, 4vw, 24px) clamp(8px, 2vw, 16px);
+    }
+    .ready-to-find-inner .sec-title {
+        max-width: 100%;
+        font-size: clamp(26px, 5.5vw + 0.5rem, 36px);
+    }
+    .ready-to-find-content .para {
+        max-width: 100%;
+    }
+    .ready-to-find-right-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 clamp(12px, 3vw, 20px) clamp(20px, 4vw, 32px);
+        min-height: 0;
+    }
+    .ready-to-find-logo-img,
+    .ready-to-find-right-img {
+        position: relative;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        left: auto;
+        max-width: min(420px, 92vw);
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .ready-to-find-logo-img {
+        order: 1;
+        margin-bottom: clamp(8px, 2vw, 16px);
+        max-width: min(260px, 55vw);
+    }
+    .ready-to-find-right-img {
+        order: 2;
+    }
+    .ready-to-find-inner .field-wrapper .input-field {
+        padding-right: clamp(130px, 34vw, 200px);
+    }
+
 }
 
 @media (max-width: 575px) {
+    .ready-to-find-inner .field-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .ready-to-find-inner .field-wrapper .input-field {
+        padding: 18px 20px;
+        font-size: 16px;
+        width: 100%;
+    }
+    .ready-to-find-inner .field-wrapper .btn-purple {
+        position: static;
+        transform: none;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 16px 24px;
+        font-size: 16px;
+    }
+    .ready-to-find-inner .field-wrapper .btn {
+        max-width: none;
+        margin: 0;
+    }
+    .ready-to-find-inner {
+        border-radius: 20px;
+    }
+    .ready-to-find-inner::before {
+        border-radius: 20px;
+    }
+    .ready-to-find-content {
+        padding: 24px 16px 12px;
+    }
     .sec-title {
         font-size: 30px;
     }
     .globe {
         bottom: -141px;
+        max-width: 70%;
     }
     .suggested-matches-sec{
-        padding: 110px 0;
+        padding: 100px 0px !important;
+    }
+    .what-is-wandr-sec p.what-is-wandr-sec__body {
+        font-size: 20px;
+    }
+    .gap-y-100 {
+       padding-bottom: 50px;
+       padding-top: 0px;
+    }
+    .one-platform-sec .sec-title {
+        font-size: 28px;
+    }
+    .ready-to-wandr-btns {
+    flex-direction: column;
+    }
+    .testimonial-card .para {
+
+        font-size: 16px;
+    }
+    .btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        font-size: 16px;
+        padding: 10px 30px;
+        border-radius: 30px;
+        max-width: 220px;
+    } 
+   
+    .ready-to-find-right-img {
+        max-width: 220px !important;
+    }
+   
+}
+
+@media (max-width: 767px) {
+    .screen-bg {
+        display: none;
+    }
+    .ready-to-find-right-content {
+        padding: 0px;
+    }
+    
+}
+
+@media (max-width: 1366px) {
+    .suggested-matches-sec {
+        padding: 150px 0;
     }
 }
+
+@media (max-width: 1024px) {
+    .screen-bg{
+        bottom: -200px;
+    }
+    .ready-to-find-right-img {
+        max-width: 450px;
+    }
+    .ready-to-find-logo-img{
+        top: 30px;
+    }
+
+
+}
+
+@media (max-width: 400px) {
+    .suggested-matches-sec {
+        padding-bottom: 30px !important;
+    }
+    .store-badges-row {
+        flex-direction: column;
+    }
+    .store-badges-row .badge-wrapper {
+        width: 100%;
+        max-width: 220px;
+    }
+    .ready-to-wandr-content {
+        bottom: 135px;
+    }
+  
+   
+}
+

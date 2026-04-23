@@ -48,26 +48,49 @@
 
 $('.testimonial-slider').slick({
     slidesToShow: 3,
+    slidesToScroll: 1,
     arrows: true,
-    prevArrow: $('.arrows-wrapper .arrow-prev'),
-    nextArrow: $('.arrows-wrapper .arrow-next'),
+    prevArrow: $('.testimonials-sec .arrow-prev'),
+    nextArrow: $('.testimonials-sec .arrow-next'),
     responsive: [
       {
-        breakpoint: 768,
+        breakpoint: 1200,
         settings: {
-          arrows: false,
-          centerMode: true,
-          centerPadding: '40px',
-          slidesToShow: 3
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          arrows: true,
+          centerMode: false,
+          centerPadding: '0px'
         }
       },
       {
-        breakpoint: 480,
+        breakpoint: 992,
         settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          arrows: true,
+          centerMode: false,
+          centerPadding: '0px'
+        }
+      },
+      {
+        breakpoint: 576,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
           arrows: false,
           centerMode: true,
-          centerPadding: '40px',
-          slidesToShow: 1
+          centerPadding: '28px'
+        }
+      },
+      {
+        breakpoint: 400,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          arrows: false,
+          centerMode: true,
+          centerPadding: '12px'
         }
       }
     ]
@@ -86,10 +109,11 @@ $('.key-features-slider').slick({
             }
           },
       {
-        breakpoint: 768,
+        // Slick uses width < breakpoint; 769 so 768px viewports get 2 slides (not 1300’s 3).
+        breakpoint: 769,
         settings: {
           arrows: false,
-          slidesToShow: 3
+          slidesToShow: 2
         }
       },
       {
