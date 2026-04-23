@@ -2,7 +2,8 @@
 
 @section('content')
 <main class="home-wrapper overflow-hidden">
-    <section class="hero position-relative z-1">
+    <section class="hero position-relative z-1 hero--atmospheric">
+        <div class="hero-atmosphere" aria-hidden="true"></div>
         <img src="{{asset('imgs/purple-shade-01.png')}}" alt="purple-shade" class="purple-shade position-absolute">
         <img src="{{asset('imgs/shade-01.png')}}" alt="shade-01" class="banner-shade-01 position-absolute">
         <!-- <img src="{{asset('imgs/grid-bg.png')}}" alt="grid-bg" class="grid-bg position-absolute"> -->
@@ -29,7 +30,9 @@
                         <img src="{{asset('imgs/avatars/1.png')}}" alt="avatar-01" class="avatar avatar-7">
                     </div> -->
                     <img src="{{asset('imgs/group-avatars.png')}}" alt="hero-img" class="group-avatars">
-                    <img src="{{asset('imgs/updated-globe.gif')}}" alt="globe" class="globe">
+                    <div class="hero-globe-layer">
+                        <img src="{{asset('imgs/updated-globe.gif')}}" alt="globe" class="globe">
+                    </div>
                 </div>
             </div>
         </div>
@@ -109,7 +112,7 @@
                 </div>
             </div>
             <div class="col-12">
-                <div class="d-flex justify-content-center align-items-center gap-3">
+                <div class="store-badges-row d-flex justify-content-center align-items-center gap-3">
                     <div class="badge-wrapper">
                         <img src="{{asset('imgs/google-play.png')}}" alt="google-play" class="google-play-badge">
                     </div>
@@ -181,12 +184,12 @@
     </section>
     <section class="testimonials-sec gap-y-100">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h2 class="sec-title text-uppercase">TESTIMONIALS</h2>
+            <div class="row align-items-center gy-3 gy-lg-0">
+                <div class="col-12 col-lg-6 text-center text-lg-start">
+                    <h2 class="sec-title text-uppercase mb-0">TESTIMONIALS</h2>
                 </div>
-                <div class="col-lg-6">
-                    <div class="arrows-wrapper d-flex justify-content-end gap-3">
+                <div class="col-12 col-lg-6">
+                    <div class="arrows-wrapper d-flex justify-content-center justify-content-lg-end gap-3">
                         <div class="arrows arrow-prev"><i class="fa-solid fa-chevron-left"></i></div>
                         <div class="arrows arrow-next"><i class="fa-solid fa-chevron-right"></i></div>
                     </div>
@@ -243,8 +246,8 @@
                         <img src="{{asset('imgs/ready-to-wandr-img.png')}}" alt="ready-to-wandr-img" class="ready-to-wandr-img">
                     </div>
                     <div class="ready-to-wandr-content">
-                        <h2 class="sec-title text-center mb-5 ">Ready to <span>Wandr?</span></h2>
-                        <div class="d-flex justify-content-center gap-3">
+                        <h2 class="sec-title text-center mb-5 sec-title-ready">Ready to <span>Wandr?</span></h2>
+                        <div class="ready-to-wandr-btns">
                             <a href="#" class="btn btn--white">Sign Up Now</a>
                             <a href="#" class="btn btn--primary">Download App</a>
                         </div>
@@ -254,27 +257,27 @@
         </div>
     </section>
     <section class="ready-to-find-sec">
-        <div class="container">
+        <div class="container px-3 px-md-4">
             <div class="ready-to-find-inner position-relative">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="ready-to-find-content">
-                            <h3 class="sec-title mb-4">Ready to Find Your Adventure Partner?</h3>
-                            <p class="para mb-4">
+                <div class="row align-items-stretch align-items-lg-stretch g-4 g-lg-0">
+                    <div class="col-12 col-lg-6 d-flex align-items-center">
+                        <div class="ready-to-find-content w-100">
+                            <h3 class="sec-title mb-3 mb-lg-4">Ready to Find Your Adventure Partner?</h3>
+                            <p class="para mb-3 mb-lg-4">
                                 Join thousands creating unforgettable experiences. Early members get premium free for 3 months.
                             </p>
-                            <form action="">
-                                <div class="field-wrapper position-relative">
-                                    <input type="text" class="input-field" placeholder="Enter Your Email Address">
-                                    <button class="btn btn-purple">Join Free</button>
+                            <form action="" class="ready-to-find-form">
+                                <div class="field-wrapper ready-to-find-field position-relative">
+                                    <input type="email" name="email" class="input-field" placeholder="Enter Your Email Address" autocomplete="email" inputmode="email">
+                                    <button type="button" class="btn btn-purple">Join Free</button>
                                 </div>
                             </form>
                         </div>
                     </div>
-                    <div class="col-lg-6 position-relative">
+                    <div class="col-12 col-lg-6 position-relative">
                         <div class="ready-to-find-right-content">
-                            <img src="{{asset('imgs/ready-to-find-right.png')}}" alt="ready-to-find-right" class="ready-to-find-right-img">
-                            <img src="{{asset('imgs/ready-to-find-logo.png')}}" alt="ready-to-find-logo" class="ready-to-find-logo-img">
+                            <img src="{{asset('imgs/ready-to-find-logo.png')}}" alt="" class="ready-to-find-logo-img img-fluid" loading="lazy">
+                            <img src="{{asset('imgs/ready-to-find-right.png')}}" alt="Couple celebrating" class="ready-to-find-right-img img-fluid" loading="lazy">
                         </div>
                     </div>
                 </div>

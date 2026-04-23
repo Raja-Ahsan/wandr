@@ -17,7 +17,7 @@
                     <li><a href="#">Stories</a></li>
                     <li><a href="#">Pricing</a></li>
                     <li class="d-lg-none w-100 px-1 mt-2">
-                        <a href="" class="btn btn--outline w-100 text-center">Get Started</a>
+                        <a href="/user/login" class="btn btn--outline w-100 text-center">Get Started</a>
                     </li>
                 </ul>
             </nav>
@@ -26,7 +26,7 @@
                     <i class="fa-solid fa-bars" aria-hidden="true"></i>
                 </button>
             </div>
-            <a href="" class="btn btn--outline d-none d-lg-inline-block text-nowrap">Get Started</a>
+            <a href="/user/login" class="btn btn--outline d-none d-lg-inline-block text-nowrap">Get Started</a>
         </div>
     </div>
 </header>
