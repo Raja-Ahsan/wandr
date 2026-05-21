@@ -23,6 +23,12 @@ $currentRouteName = Route::getCurrentRoute()->getName();
             <span><?= __tr('Dashboard') ?></span>
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= route('landing_page') ?>" title="<?= __tr('View Site') ?>">
+            <i class="fas fa-fw fa-globe"></i>
+            <span><?= __tr('View Site') ?></span>
+        </a>
+    </li>
     <li class="nav-item <?= makeLinkActive('manage.page.view', $currentRouteName) ?>">
         <a class="nav-link lw-ajax-link-action lw-action-with-url" href="<?= route('manage.page.view') ?>">
             <i class="fas fa-file"></i>

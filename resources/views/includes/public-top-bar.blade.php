@@ -161,6 +161,12 @@
                 <i class="fas fa-bolt fa-fw mr-2"></i> <span id="lwBoosterTimerCountDown"></span>
             </a>
         </li>
+        <li class="nav-item d-none d-sm-none d-md-block">
+            <a class="nav-link text-light" title="<?= __tr('View Site') ?>" href="<?= route('landing_page') ?>">
+                <i class="fas fa-globe fa-sm fa-fw mr-1 text-gray-400"></i>
+                <span class="mr-1"><?= __tr('View Site') ?></span>
+            </a>
+        </li>
         @if(isAdmin())
         <li class="nav-item d-none d-sm-none d-md-block">
                 <a class="nav-link text-warning" title="<?= __tr('Admin Panel') ?>" href="<?= route('manage.dashboard') ?>">
@@ -225,8 +231,12 @@
                     <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
                     <?= __tr('Change Email') ?>
                 </a>
-                @if(isAdmin())
                 <div class="dropdown-divider"></div>
+                <a class="dropdown-item" title="<?= __tr('View Site') ?>" href="<?= route('landing_page') ?>">
+                    <i class="fas fa-globe fa-sm fa-fw mr-2 text-gray-400"></i>
+                    <?= __tr('View Site') ?>
+                </a>
+                @if(isAdmin())
                 <a class="dropdown-item text-primary" title="<?= __tr('Admin Panel') ?>" target="_blank" href="<?= route('manage.dashboard') ?>">
                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                     <?= __tr('Admin Panel') ?>
