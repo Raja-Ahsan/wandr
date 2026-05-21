@@ -2,7 +2,9 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <div class="logo">
+                <a href="/">
                 <img src="{{ asset('imgs/logo.png') }}" alt="">
+                </a>
             </div>
             <nav class="primary-navs-wrapper flex-grow-1">
                 <ul id="primaryNavs" class="primary-navs d-flex justify-content-between align-items-center ">
@@ -11,11 +13,13 @@
                             <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         </button>
                     </li>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Features</a></li>
-                    <li><a href="#">Why Wandr</a></li>
-                    <li><a href="#">Stories</a></li>
-                    <li><a href="#">Pricing</a></li>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="{{ route('dating') }}">Dating</a></li>
+                    <li><a href="{{ route('events') }}">Events</a></li>
+                    <li><a href="">Travel</a></li>
+                    <li><a href="">Gifts</a></li>
+                    <li><a href="">Why Wandr</a></li>
+                    <li><a href="">Pricing</a></li>
                     <li class="d-lg-none w-100 px-1 mt-2">
                         <a href="/user/login" class="btn btn--outline w-100 text-center">Get Started</a>
                     </li>

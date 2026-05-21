@@ -22,9 +22,20 @@
                 <li class="nav-item">
                     <a class="nav-link js-scroll-trigger" href="<?= route('user.read.contact') ?>"><?= __tr('Contact') ?></a>
                 </li>
+                @if(isLoggedIn())
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= route('home_page') ?>"><?= __tr('Dashboard') ?></a>
+                </li>
+                @if(isAdmin())
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= route('manage.dashboard') ?>"><?= __tr('Admin Panel') ?></a>
+                </li>
+                @endif
+                @else
                 <li class="nav-item">
                     <a class="nav-link" href="<?= route('user.login') ?>"><?= __tr('Login') ?></a>
                 </li>
+                @endif
                 <!-- Language Menu -->
                 @if (!__isEmpty($translationLanguages) and count($translationLanguages) > 1)
                     <?php $translationLanguages['en_US'] = configItem('default_translation_language'); ?>

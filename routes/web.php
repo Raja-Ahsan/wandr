@@ -45,6 +45,25 @@ Route::group([
         'uses' => 'Home\Controllers\HomeController@previewPage',
     ]);
 
+    // Landing page — accessible when logged in (e.g. admin previewing public site)
+    Route::group([
+        'namespace' => 'Home\Controllers',
+    ], function () {
+        Route::get('/', [
+            'as' => 'landing_page',
+            'uses' => 'HomeController@landingPage',
+        ]);
+    });
+
+
+    Route::get('/dating', function () {
+        return view('dating.index');
+    })->name('dating');
+    Route::get('/events', function () {
+        return view('events.index');
+    })->name('events');
+
+
     /*
     User Components Public Section Related Routes
     ----------------------------------------------------------------------- */
@@ -52,12 +71,6 @@ Route::group([
         Route::group([
             'namespace' => 'Home\Controllers',
         ], function () {
-            // Get landing page view
-            Route::get('/', [
-                'as' => 'landing_page',
-                'uses' => 'HomeController@landingPage',
-            ]);
-           
             // Process search from landing page
             Route::post('/search-matches', [
                 'as' => 'search_matches',

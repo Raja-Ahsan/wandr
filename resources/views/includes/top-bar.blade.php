@@ -53,6 +53,13 @@
         @endif
         <!-- Language Menu -->
 
+        <li class="nav-item">
+            <a class="nav-link text-light" title="<?= __tr('View Site') ?>" href="<?= route('landing_page') ?>">
+                <i class="fas fa-globe fa-sm fa-fw mr-1"></i>
+                <span class="d-none d-lg-inline"><?= __tr('View Site') ?></span>
+            </a>
+        </li>
+
         <div class="topbar-divider d-none d-sm-block"></div>
 
         <!-- Nav Item - User Information -->
@@ -74,6 +81,10 @@
                 <a class="dropdown-item" href="<?= route('user.change_email') ?>">
                     <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
                     <?= __tr('Change Email') ?>
+                </a>
+                <a class="dropdown-item" href="<?= route('landing_page') ?>">
+                    <i class="fas fa-globe fa-sm fa-fw mr-2 text-gray-400"></i>
+                    <?= __tr('View Site') ?>
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
