@@ -632,9 +632,9 @@ img {
 
 }
 
-.footer {
+/* .footer {
     background-color: #18112B;
-}
+} */
 .footer-links-wrapper .footer-links-title {
     color: var(--default-color);
     font-weight: 500;
