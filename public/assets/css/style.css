@@ -38,7 +38,30 @@
     --default-color: #fff;
     --primary-theme-gradient: linear-gradient(180deg, rgba(131, 56, 236, 0) 32.69%, #8338EC 100%);
     --secondary-theme-gradient: linear-gradient(180deg, #DF0D78 0%, #B5005C 100%);
-    ;
+    --preloader-bg: linear-gradient(
+        125deg,
+        #110028 0%,
+        #5b21b6 22%,
+        #8338EC 45%,
+        #c026d3 62%,
+        #DF0D78 78%,
+        #6d28d9 92%,
+        #110028 100%
+    );
+}
+
+html {
+    scrollbar-gutter: stable;
+}
+
+html.is-preloading {
+    overflow: hidden;
+    height: 100%;
+}
+
+html.is-preloading body {
+    overflow: hidden;
+    height: 100%;
 }
 
 ::-webkit-scrollbar {
@@ -2918,6 +2941,230 @@ img {
     white-space: nowrap;
     border: 0;
 }
+/* Site preloader — vibrant brand gradient, centered heart */
+.preloader-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--primary-theme-dark);
+    background-image: var(--preloader-bg);
+    background-size: 240% 240%;
+    animation: preloader-bg-shift 10s ease-in-out infinite;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.preloader-wrapper.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.preloader-wrapper__mesh {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background-image:
+        linear-gradient(to right, rgba(167, 139, 250, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(167, 139, 250, 0.12) 1px, transparent 1px),
+        radial-gradient(ellipse 100% 70% at 50% -10%, rgba(255, 130, 194, 0.55) 0%, transparent 50%),
+        radial-gradient(ellipse 90% 65% at 0% 40%, rgba(223, 13, 120, 0.65) 0%, transparent 52%),
+        radial-gradient(ellipse 85% 60% at 100% 35%, rgba(131, 56, 236, 0.7) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 55% at 50% 110%, rgba(192, 132, 252, 0.5) 0%, transparent 48%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 42%);
+    background-size: 48px 48px, 48px 48px, auto, auto, auto, auto, auto;
+}
+
+.preloader-wrapper__mesh::before,
+.preloader-wrapper__mesh::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(72px);
+    opacity: 0.85;
+    will-change: transform;
+}
+
+.preloader-wrapper__mesh::before {
+    width: min(70vw, 520px);
+    height: min(70vw, 520px);
+    top: -12%;
+    left: -8%;
+    background: radial-gradient(circle, #ff4da6 0%, #DF0D78 40%, transparent 70%);
+    animation: preloader-orb-1 7s ease-in-out infinite;
+}
+
+.preloader-wrapper__mesh::after {
+    width: min(65vw, 480px);
+    height: min(65vw, 480px);
+    bottom: -18%;
+    right: -10%;
+    background: radial-gradient(circle, #c084fc 0%, #8338EC 45%, transparent 72%);
+    animation: preloader-orb-2 8s ease-in-out infinite;
+}
+
+.preloader-wrapper__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.preloader-wrapper__content::before {
+    content: "";
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 130, 194, 0.75) 0%,
+        rgba(223, 13, 120, 0.35) 35%,
+        rgba(131, 56, 236, 0.15) 60%,
+        transparent 72%
+    );
+    animation: preloader-heart-glow 2.4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.preloader-heart {
+    position: relative;
+    z-index: 1;
+    color: #ff4da6;
+    filter:
+        drop-shadow(0 0 20px rgba(255, 77, 166, 0.95))
+        drop-shadow(0 0 48px rgba(223, 13, 120, 0.75))
+        drop-shadow(0 0 80px rgba(131, 56, 236, 0.45));
+}
+
+@keyframes preloader-bg-shift {
+    0%, 100% {
+        background-position: 0% 40%;
+    }
+    50% {
+        background-position: 100% 60%;
+    }
+}
+
+@keyframes preloader-orb-1 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(12%, 18%) scale(1.12);
+    }
+}
+
+@keyframes preloader-orb-2 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(-14%, -12%) scale(1.1);
+    }
+}
+
+@keyframes preloader-heart-glow {
+    0%, 100% {
+        transform: scale(0.92);
+        opacity: 0.75;
+    }
+    50% {
+        transform: scale(1.08);
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .preloader-wrapper {
+        transition: none;
+        animation: none;
+        background-size: auto;
+    }
+    .preloader-wrapper__mesh::before,
+    .preloader-wrapper__mesh::after,
+    .preloader-wrapper__content::before {
+        animation: none;
+    }
+    .preloader-heart,
+    .preloader-heart div {
+        animation: none !important;
+    }
+}
+
+.lds-heart {
+    /* change color here */
+    color: var(--secondary-theme);
+  }
+  .lds-heart,
+  .lds-heart div,
+  .lds-heart div:after,
+  .lds-heart div:before {
+    box-sizing: border-box;
+  }
+  .lds-heart {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    transform: rotate(45deg);
+    transform-origin: 40px 40px;
+  }
+  .lds-heart div {
+    top: 28px;
+    left: 28px;
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: currentColor;
+    animation: lds-heart 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  .lds-heart div:after,
+  .lds-heart div:before {
+    content: " ";
+    position: absolute;
+    display: block;
+    width: 32px;
+    height: 32px;
+    background: currentColor;
+  }
+  .lds-heart div:before {
+    left: -24px;
+    border-radius: 50% 0 0 50%;
+  }
+  .lds-heart div:after {
+    top: -24px;
+    border-radius: 50% 50% 0 0;
+  }
+  @keyframes lds-heart {
+    0% {
+      transform: scale(0.95);
+    }
+    5% {
+      transform: scale(1.1);
+    }
+    39% {
+      transform: scale(0.85);
+    }
+    45% {
+      transform: scale(1);
+    }
+    60% {
+      transform: scale(0.95);
+    }
+    100% {
+      transform: scale(0.9);
+    }
+  }
 /* responsive */
 @media (min-width: 1560px) {
     .container {
