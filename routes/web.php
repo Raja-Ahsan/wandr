@@ -62,6 +62,18 @@ Route::group([
     Route::get('/events', function () {
         return view('events.index');
     })->name('events');
+    Route::get('/travel', function () {
+        return view('travel.index');
+    })->name('travel');
+    Route::get('/gift', function () {
+        return view('gift.index');
+    })->name('gift');
+    Route::get('/why-wandr', function () {
+        return view('why-wandr.index');
+    })->name('why-wandr');
+    Route::get('/packages', function () {
+        return view('packages.index');
+    })->name('packages');
 
 
     /*

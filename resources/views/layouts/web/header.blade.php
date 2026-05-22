@@ -16,10 +16,10 @@
                     <li><a href="/">Home</a></li>
                     <li><a href="{{ route('dating') }}">Dating</a></li>
                     <li><a href="{{ route('events') }}">Events</a></li>
-                    <li><a href="">Travel</a></li>
-                    <li><a href="">Gifts</a></li>
-                    <li><a href="">Why Wandr</a></li>
-                    <li><a href="">Pricing</a></li>
+                    <li><a href="{{ route('travel') }}">Travel</a></li>
+                    <li><a href="{{ route('gift') }}">Gifts</a></li>
+                    <li><a href="{{ route('why-wandr') }}">Why Wandr</a></li>
+                    <li><a href="{{ route('packages') }}">Pricing</a></li>
                     <li class="d-lg-none w-100 px-1 mt-2">
                         <a href="/user/login" class="btn btn--outline w-100 text-center">Get Started</a>
                     </li>
