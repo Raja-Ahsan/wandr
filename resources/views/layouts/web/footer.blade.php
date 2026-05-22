@@ -19,25 +19,25 @@
                 </div>
                 <div class="col-lg-8">
                     <div class="row">
+                       
                         <div class="col-md-4">
                             <div class="footer-links-wrapper">
-                                <h4 class="footer-links-title">Quick Link</h4>
+                                <h4 class="footer-links-title">Features</h4>
                                 <ul>
-                                    <li><a href="#">Home</a></li>
-                                    <li><a href="#">About</a></li>
-                                    <li><a href="#">Features</a></li>
-                                    <li><a href="#">Pricing</a></li>
+                                <li><a href="{{ route('dating') }}">Dating</a></li>
+                                    <li><a href="{{ route('events') }}">Events</a></li>
+                                    <li><a href="{{ route('travel') }}">Travel</a></li>
+                                    <li><a href="{{ route('gift') }}">Gifts</a></li>
                                 </ul>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="footer-links-wrapper">
-                                <h4 class="footer-links-title">Features</h4>
+                                <h4 class="footer-links-title">Quick Links</h4>
                                 <ul>
-                                    <li><a href="#">Social Connection</a></li>
-                                    <li><a href="#">Event Discovery</a></li>
-                                    <li><a href="#">Travel & Experiences</a></li>
-                                    <li><a href="#">Digital Gifting</a></li>
+                                    
+                                    <li><a href="{{ route('why-wandr') }}">Why Wandr</a></li>
+                                    <li><a href="{{ route('packages') }}">Pricing</a></li>
                                 </ul>
                             </div>
                         </div>

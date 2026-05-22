@@ -103,7 +103,7 @@
             </div>
 
             <p class="packages-plans__note text-center mt-4">
-                <i class="fa-solid fa-lock"></i> Secure checkout · Cancel anytime · No hidden fees
+                <i class="fa-solid fa-lock"></i> Secure checkout
             </p>
         </div>
     </section>
@@ -132,12 +132,6 @@
                             <td>10 / day</td>
                             <td class="packages-table__highlight">Unlimited</td>
                             <td>Unlimited</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Video chat</th>
-                            <td><i class="fa-solid fa-xmark packages-table__no" aria-label="No"></i></td>
-                            <td class="packages-table__highlight"><i class="fa-solid fa-check packages-table__yes" aria-label="Yes"></i></td>
-                            <td><i class="fa-solid fa-check packages-table__yes" aria-label="Yes"></i></td>
                         </tr>
                         <tr>
                             <th scope="row">Event priority</th>
