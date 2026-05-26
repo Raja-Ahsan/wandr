@@ -518,9 +518,204 @@
     color: #fbbf24 !important;
 }
 
+/* ——— @admin profile & public app (admin logged in) ——— */
+body.lw-public-admin-mode.lw-public-master {
+    font-family: var(--wandr-admin-font) !important;
+    background: var(--wandr-admin-bg) !important;
+}
+
+.lw-public-admin-mode.lw-page-bg,
+.lw-public-admin-mode #content-wrapper.lw-page-bg {
+    background:
+        radial-gradient(ellipse 90% 60% at 100% 0%, rgba(131, 56, 236, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 50% at 0% 100%, rgba(223, 13, 120, 0.08) 0%, transparent 45%),
+        var(--wandr-admin-bg) !important;
+}
+
+.lw-public-admin-mode #wrapper.container-fluid {
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.lw-public-admin-mode .lw-page-content {
+    padding: 1.5rem 1.75rem 2rem !important;
+}
+
+/* Override legacy custom.css (Fuzzy Bubbles, gray sidebar) */
+.lw-public-admin-mode.sidebar-dark .nav-item .nav-link,
+.lw-public-admin-mode.sidebar-dark .nav-item .nav-link i,
+.lw-public-admin-mode .sidebar-dark .nav-item .nav-link.active,
+.lw-public-admin-mode .sidebar-dark .nav-item.active .nav-link {
+    color: var(--wandr-admin-muted) !important;
+    background: transparent !important;
+}
+
+.lw-public-admin-mode .sidebar .sidebar-brand,
+.lw-public-admin-mode .sidebar-dark .sidebar-brand {
+    background: transparent !important;
+    border-bottom: 1px solid var(--wandr-admin-border);
+    padding: 1rem !important;
+}
+
+.lw-public-admin-mode .sidebar .nav-item.active > .nav-link,
+.lw-public-admin-mode .sidebar .nav-item .nav-link.active {
+    background: linear-gradient(90deg, rgba(223, 13, 120, 0.35) 0%, rgba(131, 56, 236, 0.25) 100%) !important;
+    color: #fff !important;
+    box-shadow: inset 3px 0 0 var(--wandr-pink);
+}
+
+.lw-public-admin-mode .sidebar .nav-item .nav-link:hover {
+    background: rgba(131, 56, 236, 0.2) !important;
+    color: #fff !important;
+}
+
+.lw-public-admin-mode .topbar.navbar,
+.lw-public-admin-mode .lw-public-master .navbar.topbar {
+    background: linear-gradient(90deg, rgba(26, 13, 50, 0.95) 0%, rgba(17, 0, 40, 0.98) 100%) !important;
+    border-bottom: 1px solid var(--wandr-admin-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.lw-public-admin-mode .topbar .nav-link {
+    color: var(--wandr-admin-muted) !important;
+}
+
+.lw-public-admin-mode .topbar .nav-link:hover {
+    color: #fff !important;
+    background: rgba(131, 56, 236, 0.2);
+    border-radius: 8px;
+}
+
+.lw-public-admin-mode .topbar .nav-link.text-warning {
+    color: var(--wandr-pink-light) !important;
+    font-weight: 600;
+}
+
+.lw-public-admin-mode .topbar .img-profile,
+.lw-public-admin-mode .topbar .lw-lazy-img.rounded-circle {
+    border: 2px solid var(--wandr-purple);
+    box-shadow: 0 0 0 2px rgba(223, 13, 120, 0.35);
+}
+
+.lw-public-admin-mode .btn-primary {
+    background: linear-gradient(135deg, var(--wandr-pink) 0%, #b5005c 100%) !important;
+    border: none !important;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* Profile page cards */
+.lw-public-admin-mode .lw-contains-profile-fields .card {
+    background: var(--wandr-admin-surface);
+    border: 1px solid var(--wandr-admin-border);
+    border-radius: var(--wandr-admin-radius);
+    box-shadow: var(--wandr-admin-shadow);
+    overflow: hidden;
+}
+
+.lw-public-admin-mode .lw-contains-profile-fields .card-header {
+    background: rgba(131, 56, 236, 0.12) !important;
+    border-bottom: 1px solid var(--wandr-admin-border) !important;
+    color: #fff;
+}
+
+.lw-public-admin-mode .lw-contains-profile-fields .card-body {
+    color: var(--wandr-admin-text);
+    background: transparent;
+}
+
+.lw-public-admin-mode .lw-contains-profile-fields .card-header h4,
+.lw-public-admin-mode .lw-contains-profile-fields .card-header h5 {
+    color: #fff !important;
+    font-family: var(--wandr-admin-font);
+}
+
+.lw-public-admin-mode .lw-contains-profile-fields hr {
+    border-color: var(--wandr-admin-border);
+}
+
+.lw-public-admin-mode .alert-info {
+    background: rgba(131, 56, 236, 0.15);
+    border: 1px solid rgba(131, 56, 236, 0.35);
+    color: var(--wandr-admin-text);
+    border-radius: 10px;
+}
+
+.lw-public-admin-mode .alert-light,
+.lw-public-admin-mode .alert-secondary {
+    background: var(--wandr-admin-surface-2);
+    border-color: var(--wandr-admin-border);
+    color: var(--wandr-admin-muted);
+}
+
+.lw-public-admin-mode .btn-link.text-primary {
+    color: var(--wandr-pink-light) !important;
+}
+
+.lw-public-admin-mode .lw-featured-users-block {
+    background: var(--wandr-admin-surface);
+    border: 1px solid var(--wandr-admin-border);
+    border-radius: var(--wandr-admin-radius);
+}
+
+/* Manage pages tables (Gifts, Users, etc.) */
+.lw-admin-section .lw-page-content > .d-sm-flex.align-items-center,
+.lw-admin-section .lw-page-content > .d-flex.align-items-center {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--wandr-admin-border);
+}
+
+.lw-admin-section .lw-page-content > .d-sm-flex .h3,
+.lw-admin-section .lw-page-content > .d-flex .h3 {
+    font-size: 1.65rem;
+    font-weight: 600;
+    color: #fff !important;
+    margin-bottom: 0;
+}
+
+.lw-admin-section .table thead th {
+    background: rgba(131, 56, 236, 0.18);
+    border: none;
+    padding: 0.85rem 1rem;
+    white-space: nowrap;
+}
+
+.lw-admin-section .table tbody td {
+    background: rgba(0, 0, 0, 0.12);
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+}
+
+.lw-admin-section .table-hover tbody tr:hover td {
+    background: rgba(131, 56, 236, 0.14);
+}
+
+.lw-admin-section .table .img-thumbnail,
+.lw-admin-section .lw-item-img-thumbnail {
+    border-radius: 10px;
+    border: 1px solid var(--wandr-admin-border);
+    max-height: 56px;
+    background: var(--wandr-admin-surface-2);
+}
+
+.lw-admin-section .btn-black,
+.lw-admin-section .lw-datatable-action-dropdown-toggle {
+    background: var(--wandr-admin-surface-2) !important;
+    border: 1px solid var(--wandr-admin-border) !important;
+    color: var(--wandr-admin-text) !important;
+    border-radius: 8px;
+}
+
+.lw-admin-section .dropdown-menu .dropdown-item i {
+    color: var(--wandr-pink-light);
+}
+
 @media (max-width: 768px) {
-    .lw-admin-section .lw-page-content {
-        padding: 1rem;
+    .lw-admin-section .lw-page-content,
+    .lw-public-admin-mode .lw-page-content {
+        padding: 1rem !important;
     }
 
     .lw-stat-card {

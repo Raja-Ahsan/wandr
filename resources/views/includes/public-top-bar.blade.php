@@ -1,8 +1,8 @@
 <!-- Topbar -->
-<nav class="navbar navbar-expand navbar-light bg-dark topbar mb-4 static-top shadow">
+<nav class="navbar navbar-expand navbar-light bg-dark topbar mb-4 static-top shadow{{ isAdmin() ? ' lw-admin-topbar' : '' }}">
     <!-- Sidebar Toggle (Topbar) -->
     <button type="button" id="sidebarToggleTop" class="btn btn-link d-block d-md-none rounded-circle mr-3">
-        <i class="fa fa-bars"></i>
+        <i class="fa-solid fa-bars"></i>
     </button>
     <ul class="navbar-nav ml-0">
         <!-- Nav Item - Search Dropdown (Visible Only XS) -->

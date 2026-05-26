@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+<ul class="navbar-nav sidebar sidebar-dark accordion{{ isAdmin() ? ' lw-admin-sidebar' : '' }}" id="accordionSidebar">
     <!-- Sidebar - Brand -->
     <li>
         <a class="sidebar-brand d-flex align-items-center bg-dark" href="<?= url('/home') ?>">

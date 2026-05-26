@@ -45,6 +45,7 @@
 
 	@php
 		$isAdminPanel = request()->is('admin', 'admin/*');
+		$useWandrAdminTheme = $isAdminPanel || (isLoggedIn() && isAdmin());
 		$styleBundles = [
 			'dist/css/bootstrap-assets-app*.css',
 			'dist/css/public-assets-app*.css',
@@ -55,13 +56,13 @@
 			'dist/css/messenger*.css',
 			'dist/css/login-register*.css',
 		];
-		if (! $isAdminPanel) {
+		if (! $useWandrAdminTheme) {
 			$styleBundles[] = 'dist/fa/css/all.min.css';
 		}
 	@endphp
 	<!-- Custom styles for this template-->
 	<?= __yesset($styleBundles, true) ?>
-	@if($isAdminPanel)
+	@if($useWandrAdminTheme)
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	<link rel="stylesheet" href="{{ asset('assets/css/admin-theme.css') }}">
 	@endif

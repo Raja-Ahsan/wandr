@@ -1,9 +1,9 @@
 <!-- include header -->
 @include('includes.header')
 <!-- /include header -->
-<body id="page-top" class="lw-page-bg lw-public-master">
+<body id="page-top" class="lw-page-bg lw-public-master{{ (isLoggedIn() && isAdmin()) ? ' lw-admin-section lw-public-admin-mode' : '' }}">
     <!-- Page Wrapper -->
-    <div id="wrapper" class="container-fluid">
+    <div id="wrapper" class="container-fluid px-0">
         <!-- include sidebar -->
         @if(isLoggedIn())
         @include('includes.public-sidebar')
@@ -63,7 +63,7 @@
 
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
+        <i class="fa-solid fa-chevron-up"></i>
     </a>
     <!-- /Scroll to Top Button-->
 
