@@ -43,18 +43,28 @@
 	<meta property="twitter:description" content="@yield('description')">
 	<meta property="twitter:image" content="@yield('page-image')">
 
+	@php
+		$isAdminPanel = request()->is('admin', 'admin/*');
+		$styleBundles = [
+			'dist/css/bootstrap-assets-app*.css',
+			'dist/css/public-assets-app*.css',
+			'dist/css/vendorlibs-datatable.css',
+			'dist/css/vendorlibs-photoswipe.css',
+			'dist/css/vendorlibs-smartwizard.css',
+			'dist/css/custom*.css',
+			'dist/css/messenger*.css',
+			'dist/css/login-register*.css',
+		];
+		if (! $isAdminPanel) {
+			$styleBundles[] = 'dist/fa/css/all.min.css';
+		}
+	@endphp
 	<!-- Custom styles for this template-->
-	<?= __yesset([
-		'dist/css/bootstrap-assets-app*.css',
-		'dist/css/public-assets-app*.css',
-		'dist/fa/css/all.min.css',
-		"dist/css/vendorlibs-datatable.css",
-		"dist/css/vendorlibs-photoswipe.css",
-		"dist/css/vendorlibs-smartwizard.css",
-		'dist/css/custom*.css',
-		'dist/css/messenger*.css',
-		'dist/css/login-register*.css'
-	], true) ?>
+	<?= __yesset($styleBundles, true) ?>
+	@if($isAdminPanel)
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="{{ asset('assets/css/admin-theme.css') }}">
+	@endif
     <style>
         body:not(.lw-ajax-form-ready) form.lw-ajax-form:before {
             content: "{{ __tr('please wait ...') }}";

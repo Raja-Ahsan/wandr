@@ -15,7 +15,7 @@ $isLcOk = true;
         <!-- /include sidebar -->
 
         <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column bg-gray-900">
+        <div id="content-wrapper" class="d-flex flex-column lw-admin-content-wrap">
             <div id="content">
                 <!-- include top bar -->
                 @if(isLoggedIn())
@@ -46,7 +46,7 @@ $isLcOk = true;
 
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
+        <i class="fa-solid fa-chevron-up"></i>
     </a>
     <!-- /Scroll to Top Button-->
 
