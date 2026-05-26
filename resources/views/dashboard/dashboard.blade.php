@@ -8,148 +8,244 @@
 @section('twitter-card-image', getStoreSettings('logo_image_url'))
 @section('page-url', url()->current())
 
-<div class="lw-dashboard">
-    <div class="lw-dashboard-header">
-        <h1 class="lw-dashboard-header__title"><?= __tr('Dashboard') ?> <span>Overview</span></h1>
-        <p class="lw-dashboard-header__sub"><?= __tr('Monitor users, reports, and earnings at a glance.') ?></p>
-    </div>
 
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="lw-stat-card lw-stat-card--primary">
-                <div class="lw-stat-card__icon"><i class="fa-solid fa-signal" aria-hidden="true"></i></div>
-                <div>
-                    <div class="lw-stat-card__label"><?= __tr("Users Online") ?></div>
-                    <div class="lw-stat-card__value">
-                        <?= __tr('__onlineUsersCount__', ['__onlineUsersCount__' => $dashboardData['online']]) ?>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-200">
+        <?= __tr("Dashboard") ?>
+    </h1>
+</div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="lw-stat-card lw-stat-card--success">
-                <div class="lw-stat-card__icon"><i class="fa-solid fa-user-check" aria-hidden="true"></i></div>
-                <div>
-                    <div class="lw-stat-card__label">
-                        <a href="<?= route('manage.user.view_list', ['status' => 1]) ?>"><?= __tr("Active Users") ?></a>
+<!-- Counts -->
+<div class="row">
+    <!-- Users Online -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            <?= __tr("Users Online") ?>
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <?= __tr('__onlineUsersCount__', [
+                                                                                '__onlineUsersCount__' => $dashboardData['online']
+                                                                            ]) ?>
+                        </div>
                     </div>
-                    <div class="lw-stat-card__value">
-                        <?= __tr('__activeUsersCount__', ['__activeUsersCount__' => $dashboardData['active']]) ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="lw-stat-card lw-stat-card--info">
-                <div class="lw-stat-card__icon"><i class="fa-solid fa-user-clock" aria-hidden="true"></i></div>
-                <div>
-                    <div class="lw-stat-card__label">
-                        <a href="<?= route('manage.user.view_list', ['status' => 2]) ?>"><?= __tr("Inactive Users") ?></a>
-                    </div>
-                    <div class="lw-stat-card__value">
-                        <?= __tr('__inactiveUsersCount__', ['__inactiveUsersCount__' => $dashboardData['inactive']]) ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="lw-stat-card lw-stat-card--danger">
-                <div class="lw-stat-card__icon"><i class="fa-solid fa-user-slash" aria-hidden="true"></i></div>
-                <div>
-                    <div class="lw-stat-card__label">
-                        <a href="<?= route('manage.user.view_list', ['status' => 3]) ?>"><?= __tr("Blocked Users") ?></a>
-                    </div>
-                    <div class="lw-stat-card__value">
-                        <?= __tr('__blockedUsersCount__', ['__blockedUsersCount__' => $dashboardData['blocked']]) ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-6 col-md-6 mb-4">
-            <div class="lw-stat-card lw-stat-card--warning">
-                <div class="lw-stat-card__icon"><i class="fa-solid fa-flag" aria-hidden="true"></i></div>
-                <div>
-                    <div class="lw-stat-card__label">
-                        <a href="<?= route('manage.abuse_report.read.list', ['status' => 1]) ?>"><?= __tr("Awaiting Abuse Reports") ?></a>
-                    </div>
-                    <div class="lw-stat-card__value">
-                        <?= __tr('__awaitingAbuseReportsCount__', ['__awaitingAbuseReportsCount__' => $dashboardData['awaiting_abuse_report_count']]) ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-6 col-md-6 mb-4">
-            <div class="lw-stat-card lw-stat-card--pink">
-                <div class="lw-stat-card__icon"><i class="fa-solid fa-sack-dollar" aria-hidden="true"></i></div>
-                <div>
-                    <div class="lw-stat-card__label"><?= __tr("Current Month Earnings") ?></div>
-                    <div class="lw-stat-card__value">
-                        <?= __tr('__currencyCode__ __currentMonthIncome__', [
-                            '__currencyCode__' => $dashboardData['currency'],
-                            '__currentMonthIncome__' => $dashboardData['current_month_income']
-                        ]) ?>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- / Users Online -->
 
-    <div class="row">
-        <div class="col-xl-12 mb-4">
-            <div class="card shadow mb-4 lw-chart-card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary"><?= __tr("Earnings Overview") ?></h6>
+    <!-- Active Users -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <a class="nav-link p-0" href="<?= route('manage.user.view_list', ['status' => 1]) ?>">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                <?= __tr("Active Users") ?>
+                            </div>
+                        </a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <?= __tr('__activeUsersCount__', [
+                                                                                '__activeUsersCount__' => $dashboardData['active']
+                                                                            ]) ?>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="myAreaChart" class="chartjs-render-monitor"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- / Active Users -->
+
+    <!-- Inactive Users -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <a class="nav-link p-0" href="<?= route('manage.user.view_list', ['status' => 2]) ?>">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                <?= __tr("Inactive Users") ?>
+                            </div>
+                        </a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <?= __tr('__inactiveUsersCount__', [
+                               '__inactiveUsersCount__' => $dashboardData['inactive']
+                                   ]) ?>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-times fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / Inactive Users -->
+
+    <!-- Pending Requests Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <a class="nav-link p-0" href="<?= route('manage.user.view_list', ['status' => 3]) ?>">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                <?= __tr("Blocked Users") ?>
+                            </div>
+                        </a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <?= __tr('__blockedUsersCount__', [
+                                                                                '__blockedUsersCount__' => $dashboardData['blocked']
+                                                                            ]) ?>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-slash fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-xl-12 mb-4">
-            <div class="card shadow mb-4 lw-chart-card">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary"><?= __tr('Last 12 Month Registrations') ?></h6>
-                </div>
-                <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="myAreaChart2" class="chartjs-render-monitor"></canvas>
+    <!-- Pending Requests Card Example -->
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <a class="nav-link p-0" href="<?= route('manage.abuse_report.read.list', ['status' => 1]) ?>">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1" > 
+                            <?= __tr("Awaiting Abuse Reports") ?>
+                        </div>
+                    </a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <?= __tr('__awaitingAbuseReportsCount__', [
+                         '__awaitingAbuseReportsCount__' => $dashboardData['awaiting_abuse_report_count']
+                 ]) ?>
+                        </div>
                     </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earning this month -->
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            <?= __tr("Current Month Earnings") ?>
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <?= __tr('__currencyCode__ __currentMonthIncome__', [
+                                '__currencyCode__' => $dashboardData['currency'],
+                                '__currentMonthIncome__' => $dashboardData['current_month_income']
+                            ]) ?>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-hand-holding-usd fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / Earning this month -->
+
+</div>
+
+<div class="row">
+    <div class="col-xl-12 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <?= __tr("Earnings Overview") ?>
+                </h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-area">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                            <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                    <canvas id="myAreaChart" style="display: block; width: 668px; height: 320px;" width="668"
+                        height="320" class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <?= __tr('Last 12 Month Registrations') ?>
+                </h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-area">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                            <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                    <canvas id="myAreaChart2" style="display: block; width: 668px; height: 320px;" width="668"
+                        height="320" class="chartjs-render-monitor"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
 @lwPush('appScripts')
 <script type="text/javascript">
     var year = @json($dashboardData['labels']),
     currency = '<?= $dashboardData['currency'] ?>';
+    // Area Chart Example
     var ctx = document.getElementById("myAreaChart");
     var myLineChart = new Chart(ctx, {
+        // locale:'mr'
         type: 'line',
         data: {
             labels: year,
             datasets: [{
                 label: "{{ __tr('Earnings') }}",
                 lineTension: 0.3,
-                backgroundColor: "rgba(131, 56, 236, 0.12)",
-                borderColor: "#DF0D78",
+                backgroundColor: "rgba(78, 115, 223, 0.05)",
+                borderColor: "#c61d61",
                 pointRadius: 3,
                 pointBackgroundColor: "rgba(255,255,255, 1)",
-                pointBorderColor: "#8338EC",
-                pointHoverRadius: 4,
-                pointHoverBackgroundColor: "#fff",
-                pointHoverBorderColor: "#DF0D78",
+                pointBorderColor: "rgba(255,255,255, 1)",
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: "rgba(255,255,255, 1)",
+                pointHoverBorderColor: "rgba(255,255,255, 1)",
                 pointHitRadius: 10,
                 pointBorderWidth: 2,
                 data: <?= json_encode($dashboardData['month_wise_income']) ?>,
@@ -159,16 +255,54 @@
             locale : window.appConfig.locale,
             maintainAspectRatio: false,
             layout: {
-                padding: { left: 10, right: 25, top: 25, bottom: 0 }
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
             },
-            legend: { display: false },
+            // scales: {
+            //     x: [{
+            //         time: {
+            //             unit: 'date'
+            //         },
+            //         gridLines: {
+            //             display: false,
+            //             drawBorder: false
+            //         },
+            //         ticks: {
+            //             maxTicksLimit: 7
+            //         }
+            //     }],
+            //     yAxes: [{
+            //         ticks: {
+            //             maxTicksLimit: 5,
+            //             padding: 10,
+            //             // Include a dollar sign in the ticks
+            //             callback: function(value, index, values) {
+            //                 return (currency + value);
+            //             }
+            //         },
+            //         gridLines: {
+            //             color: "rgb(234, 236, 244)",
+            //             zeroLineColor: "rgb(234, 236, 244)",
+            //             drawBorder: false,
+            //             borderDash: [2],
+            //             zeroLineBorderDash: [2]
+            //         }
+            //     }],
+            // },
+            legend: {
+                display: false
+            },
             tooltips: {
                 backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#1B012C",
+                bodyFontColor: "#000000",
                 titleMarginBottom: 10,
-                titleFontColor: '#8338EC',
+                titleFontColor: 'rgba(210, 0, 156, 1)',
                 titleFontSize: 14,
-                borderColor: '#EDE8F4',
+                borderColor: '#dddfeb',
                 borderWidth: 1,
                 xPadding: 15,
                 yPadding: 15,
@@ -186,8 +320,9 @@
         }
     });
 
+    // Area Chart Example
     var ctx2 = document.getElementById("myAreaChart2");
-    var myLineChart2 = new Chart(ctx2, {
+    var myLineChart = new Chart(ctx2, {
         type: 'bar',
         data: {
             labels: year,
@@ -197,16 +332,54 @@
             locale : window.appConfig.locale,
             maintainAspectRatio: false,
             layout: {
-                padding: { left: 10, right: 25, top: 25, bottom: 0 }
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
             },
-            legend: { display: false },
+            // scales: {
+            //     xAxes: [{
+            //         time: {
+            //             unit: 'date'
+            //         },
+            //         gridLines: {
+            //             display: false,
+            //             drawBorder: false
+            //         },
+            //         ticks: {
+            //             maxTicksLimit: 7
+            //         }
+            //     }],
+            //     yAxes: [{
+            //         ticks: {
+            //             maxTicksLimit: 5,
+            //             padding: 10,
+            //             // Include a dollar sign in the ticks
+            //             callback: function(value, index, values) {
+            //                 return value;
+            //             }
+            //         },
+            //         gridLines: {
+            //             color: "rgb(234, 236, 244)",
+            //             zeroLineColor: "rgb(234, 236, 244)",
+            //             drawBorder: false,
+            //             borderDash: [2],
+            //             zeroLineBorderDash: [2]
+            //         }
+            //     }],
+            // },
+            legend: {
+                display: false
+            },
             tooltips: {
                 backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#1B012C",
+                bodyFontColor: "#000000",
                 titleMarginBottom: 10,
-                titleFontColor: '#DF0D78',
+                titleFontColor: 'rgba(210, 0, 156, 1)',
                 titleFontSize: 14,
-                borderColor: '#EDE8F4',
+                borderColor: '#dddfeb',
                 borderWidth: 1,
                 xPadding: 15,
                 yPadding: 15,

@@ -1,9 +1,9 @@
 <!-- Topbar -->
-<nav class="navbar navbar-expand navbar-light bg-dark topbar lw-admin-topbar mb-4 static-top shadow">
+<nav class="navbar navbar-expand navbar-light bg-dark topbar mb-4 static-top shadow">
 
     <!-- Sidebar Toggle (Topbar) -->
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-        <i class="fa-solid fa-bars"></i>
+        <i class="fa fa-bars"></i>
     </button>
 
     <strong>
@@ -37,7 +37,7 @@
         @if(!__isEmpty($translationLanguages) and (count($translationLanguages) > 1))
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <?= (isset($translationLanguages[config('CURRENT_LOCALE')])) ? $translationLanguages[config('CURRENT_LOCALE')]['name'] : '' ?> &nbsp; <i class="fa-solid fa-language"></i>
+                <?= (isset($translationLanguages[config('CURRENT_LOCALE')])) ? $translationLanguages[config('CURRENT_LOCALE')]['name'] : '' ?> &nbsp; <i class="fas fa-language"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                 <?php foreach ($translationLanguages as $languageId => $language) {
@@ -55,7 +55,7 @@
 
         <li class="nav-item">
             <a class="nav-link text-light" title="<?= __tr('View Site') ?>" href="<?= route('landing_page') ?>">
-                <i class="fa-solid fa-globe fa-sm fa-fw mr-1"></i>
+                <i class="fas fa-globe fa-sm fa-fw mr-1"></i>
                 <span class="d-none d-lg-inline"><?= __tr('View Site') ?></span>
             </a>
         </li>
@@ -71,24 +71,24 @@
             <!-- Dropdown - User Information -->
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                 <a class="dropdown-item" href="<?= route('user.profile_view', ['username' => getUserAuthInfo('profile.username')]) ?>">
-                    <i class="fa-solid fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     <?= __tr('Profile') ?>
                 </a>
                 <a class="dropdown-item" href="<?= route('user.change_password') ?>">
-                    <i class="fa-solid fa-key fa-sm fa-fw mr-2 text-gray-400"></i>
+                    <i class="fas fa-key fa-sm fa-fw mr-2 text-gray-400"></i>
                     <?= __tr('Change Password') ?>
                 </a>
                 <a class="dropdown-item" href="<?= route('user.change_email') ?>">
-                    <i class="fa-solid fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
+                    <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
                     <?= __tr('Change Email') ?>
                 </a>
                 <a class="dropdown-item" href="<?= route('landing_page') ?>">
-                    <i class="fa-solid fa-globe fa-sm fa-fw mr-2 text-gray-400"></i>
+                    <i class="fas fa-globe fa-sm fa-fw mr-2 text-gray-400"></i>
                     <?= __tr('View Site') ?>
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fa-solid fa-right-from-bracket fa-sm fa-fw mr-2 text-gray-400"></i>
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                     <?= __tr('Logout') ?>
                 </a>
             </div>
