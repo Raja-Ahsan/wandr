@@ -1,0 +1,23 @@
+/**
+ * SweetAlert2 readable on dark-themed pages (Wandr admin / profile).
+ */
+.swal2-popup.lw-swal-popup,
+.swal2-popup {
+    color: #545454;
+    background: #fff;
+}
+
+.swal2-popup .swal2-title,
+.swal2-popup.lw-swal-popup .lw-swal-title {
+    color: #595959 !important;
+}
+
+.swal2-popup .swal2-html-container,
+.swal2-popup .swal2-content,
+.swal2-popup.lw-swal-popup .lw-swal-text {
+    color: #545454 !important;
+}
+
+.swal2-popup .swal2-styled.swal2-confirm {
+    color: #fff !important;
+}

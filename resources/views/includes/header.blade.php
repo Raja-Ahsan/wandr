@@ -7,13 +7,18 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=no">
 	<meta name="description" content="">
 	<meta name="author" content="">
+	@php
+		$isAdminPanel = request()->is('admin', 'admin/*');
+		$useWandrAdminTheme = $isAdminPanel || isLoggedIn();
+	@endphp
 	<title>@yield('head-title') : <?= getStoreSettings('name') ?></title>
 	<!-- Custom fonts for this template-->
+	@if(! $useWandrAdminTheme)
 	<link href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700&display=swap" rel="stylesheet">
-	{{-- <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet"> --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles:wght@400;700&display=swap" rel="stylesheet">
+	@endif
 	<link rel="shortcut icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/x-icon">
 	<link rel="icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/x-icon">
 	@if(getStoreSettings('allow_recaptcha'))
@@ -44,8 +49,6 @@
 	<meta property="twitter:image" content="@yield('page-image')">
 
 	@php
-		$isAdminPanel = request()->is('admin', 'admin/*');
-		$useWandrAdminTheme = $isAdminPanel || (isLoggedIn() && isAdmin());
 		$styleBundles = [
 			'dist/css/bootstrap-assets-app*.css',
 			'dist/css/public-assets-app*.css',

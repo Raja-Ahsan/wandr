@@ -697,6 +697,7 @@
 	@endif
 	<!-- /User Specifications -->
 
+	@include('user.profile.wandr-profile-sections')
 
 	<!-- user report Modal-->
 	<div class="modal fade" id="lwReportUserDialog" tabindex="-1" role="dialog" aria-labelledby="userReportModalLabel" aria-hidden="true">
@@ -1014,6 +1015,24 @@
 		$('#lwUser' + formId + 'Form').toggle();
 		$('#lwClose' + formId + 'Block').toggle();
 	}
+	$('#lwWandrAddTravelRow').on('click', function (e) {
+		e.preventDefault();
+		var rowHtml = '<div class="form-group row lw-wandr-travel-row">' +
+			'<div class="col-sm-6 mb-3 mb-sm-0"><label><?= __tr('Destination') ?></label>' +
+			'<input type="text" name="travel_destination[]" class="form-control"></div>' +
+			'<div class="col-sm-6 mb-3 mb-sm-0"><label><?= __tr('Year') ?></label>' +
+			'<input type="text" name="travel_year[]" class="form-control"></div>' +
+			'<div class="col-sm-12 mb-3 mb-sm-0"><label><?= __tr('Experience') ?></label>' +
+			'<textarea name="travel_description[]" class="form-control" rows="2"></textarea></div>' +
+			'<div class="col-sm-12 mb-2 text-right">' +
+			'<button type="button" class="btn btn-sm btn-link text-danger lw-wandr-remove-travel-row"><?= __tr('Remove') ?></button></div></div>';
+		$('#lwWandrTravelRowsContainer').append(rowHtml);
+	});
+	$(document).on('click', '.lw-wandr-remove-travel-row', function () {
+		if ($('.lw-wandr-travel-row').length > 1) {
+			$(this).closest('.lw-wandr-travel-row').remove();
+		}
+	});
 	// Click on profile and cover container edit / close button 
 	$('#lwEditProfileAndCoverPhoto, #lwCloseProfileAndCoverBlock').click(function(e) {
 		e.preventDefault();

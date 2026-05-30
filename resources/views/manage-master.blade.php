@@ -32,12 +32,12 @@ $isLcOk = true;
                 @else
                     <?php echo $pageRequested ?? ''; ?>
                 @endif
+                @include('includes.footer')
                 </div>
                 <!-- /.container-fluid -->
             </div>
 
             <!-- include footer -->
-            @include('includes.footer')
             <!-- /include footer -->
         </div>
         <!-- End of Content Wrapper -->

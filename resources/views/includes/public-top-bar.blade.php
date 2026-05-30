@@ -1,5 +1,5 @@
 <!-- Topbar -->
-<nav class="navbar navbar-expand navbar-light bg-dark topbar mb-4 static-top shadow{{ isAdmin() ? ' lw-admin-topbar' : '' }}">
+<nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow">
     <!-- Sidebar Toggle (Topbar) -->
     <button type="button" id="sidebarToggleTop" class="btn btn-link d-block d-md-none rounded-circle mr-3">
         <i class="fa-solid fa-bars"></i>

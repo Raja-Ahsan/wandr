@@ -51,7 +51,12 @@
 
 :root {
     --lw-primary-color: #DF0D78;
-    --lw-page-bg-color: #1b1b23
+    --lw-page-bg-color: #1b1b23;
+    --primary-theme: #8338EC;
+    --primary-theme-dark: #110028; 
+    --secondary-theme: #DF0D78;
+    --primary-theme-gradient: linear-gradient(180deg, rgba(131, 56, 236, 0) 32.69%, #8338EC 100%);
+    --secondary-theme-gradient: linear-gradient(180deg, #DF0D78 0%, #B5005C 100%);
 }
 
 html {
@@ -355,7 +360,58 @@ label.lw-validation-error {
 .toggled .sidebar-brand-icon {
     display: block
 }
+.sidebar-brand,
+.navbar-expand {
+    height: 102px;
+}
+.sidebar-wrapper {
+    height: calc(100vh - 102px);
+    overflow-y: auto;
+}
+.lw-page-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.lw-admin-section {
+    overflow: hidden;
+}
+.lw-page-content {
+    height: calc(100vh - 102px);
+    overflow-y: auto;
+}
+.lw-admin-content-wrap .sticky-footer {
+    position: unset !important;
+    margin: 0;
+}
+.lw-page-content {
+    padding: 0 !important;
+}
 
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: var(--primary-theme);
+
+}
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: var(--secondary-theme-gradient);
+    border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-theme);
+}
+.sidebar-brand {
+    margin: 0;
+    height: 112px;
+}
+/* responsive */
 @media (max-width:768px) {
     .sidebar {
         border-right: 1px solid #3c3c3c
@@ -2727,8 +2783,18 @@ input[type=number]::-webkit-outer-spin-button {
     background-color: #1c1c24
 }
 
-.swal2-html-container {
-    color: #fff !important
+/* SweetAlert2 — default popup is light; dark theme must not force white text */
+.swal2-popup {
+    color: #545454
+}
+
+.swal2-popup .swal2-title {
+    color: #595959 !important
+}
+
+.swal2-popup .swal2-html-container,
+.swal2-popup .swal2-content {
+    color: #545454 !important
 }
 
 div.lw-validation-error {

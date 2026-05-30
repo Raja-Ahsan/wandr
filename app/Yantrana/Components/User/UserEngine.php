@@ -13,6 +13,7 @@ use App\Yantrana\Base\BaseMailer;
 use App\Yantrana\Components\AbuseReport\Repositories\ManageAbuseReportRepository;
 use App\Yantrana\Components\Item\Repositories\ManageItemRepository;
 use App\Yantrana\Components\Media\MediaEngine;
+use App\Yantrana\Components\UserSetting\Models\CityModel;
 use App\Yantrana\Components\UserSetting\Repositories\UserSettingRepository;
 use App\Yantrana\Components\User\CreditWalletEngine;
 use App\Yantrana\Components\User\Repositories\CreditWalletRepository;
@@ -386,7 +387,7 @@ class UserEngine extends BaseEngine
                             'activation_url' => URL::temporarySignedRoute('user.account.activation', Carbon::now()->addHours(configItem('account.expiry')), ['userUid' => $newUser->_uid]),
                         ];
                         // check if email send to member
-                        if ($this->baseMailer->notifyToUser('Your account registered successfully.', 'account.activation', $emailData, $newUser->email)) {
+                        if ($this->baseMailer->notifyToUser(__tr('Verify your email — __siteName__', ['__siteName__' => getStoreSettings('name')]), 'account.activation', $emailData, $newUser->email)) {
                             return $this->userRepository->transactionResponse(1, [
                                 'show_message' => true,
                                 'activation_required' => true,
@@ -1018,6 +1019,9 @@ class UserEngine extends BaseEngine
             }
         }
 
+        $wandrProfile = getWandrProfileExtras($userProfile);
+        $wandrProfileConfig = config('wandr-profile');
+
         return $this->engineReaction(1, [
             'isOwnProfile' => $isOwnProfile,
             'userData' => $userData,
@@ -1028,6 +1032,8 @@ class UserEngine extends BaseEngine
             'workStatuses' => $userSettingConfig['work_status'],
             'educations' => $userSettingConfig['educations'],
             'userProfileData' => $userProfileData,
+            'wandrProfile' => $wandrProfile,
+            'wandrProfileConfig' => $wandrProfileConfig,
             'photosData' => $photosData,
             'userSpecificationData' => $userSpecificationData,
             'userLikeData' => $userLikeData,
@@ -1875,12 +1881,22 @@ class UserEngine extends BaseEngine
             $profileInfo['cover_picture_url'] = getMediaUrl($coverPictureFolderPath, $userProfile['cover_picture']);
         }
 
+        $wizardLocationData = [
+            'hasStaticCities' => CityModel::count() > 0,
+            'useFreeLocation' => ! getStoreSettings('allow_google_map'),
+        ];
+
+        if ($wizardLocationData['useFreeLocation']) {
+            $wizardLocationData['countries'] = $this->countryRepository->fetchAll()->toArray();
+        }
+
         return $this->engineReaction(1, [
             'profileStatus' => $profileStatus,
             'profileInfo' => $profileInfo,
             'genders' => configItem('user_settings.gender'),
             'profileMediaRestriction' => getMediaRestriction('profile'),
             'coverImageMediaRestriction' => getMediaRestriction('cover_image'),
+            'wizardLocationData' => $wizardLocationData,
         ]);
     }
 

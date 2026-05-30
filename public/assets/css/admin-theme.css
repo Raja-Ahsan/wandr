@@ -87,7 +87,6 @@
 }
 
 .lw-admin-section .sidebar-brand .lw-logo-img {
-    max-height: 36px;
     width: auto;
     filter: brightness(1.05);
 }
@@ -657,6 +656,163 @@ body.lw-public-admin-mode.lw-public-master {
     background: var(--wandr-admin-surface);
     border: 1px solid var(--wandr-admin-border);
     border-radius: var(--wandr-admin-radius);
+}
+
+/* User app: inherit full admin chrome (sidebar, topbar, footer, cards) */
+body.lw-public-admin-mode.lw-admin-section .sidebar {
+    background: linear-gradient(180deg, #1a0d32 0%, var(--wandr-purple-dark) 55%, #0a0414 100%) !important;
+    border-right: 1px solid var(--wandr-admin-border);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+}
+
+body.lw-public-admin-mode.lw-admin-section .sidebar .nav-item .nav-link {
+    border-radius: 10px;
+    margin: 2px 0.65rem;
+    padding: 0.65rem 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+body.lw-public-admin-mode.lw-admin-section .sidebar .sidebar-divider {
+    border-color: var(--wandr-admin-border);
+}
+
+body.lw-public-admin-mode.lw-admin-section .topbar {
+    padding: 0.65rem 1.25rem;
+    backdrop-filter: blur(8px);
+}
+
+body.lw-public-admin-mode.lw-admin-section .topbar .dropdown-menu,
+body.lw-public-admin-mode.lw-admin-section .lw-basic-filter-container {
+    background: var(--wandr-admin-surface-2) !important;
+    border: 1px solid var(--wandr-admin-border) !important;
+    border-radius: var(--wandr-admin-radius);
+    color: var(--wandr-admin-text);
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-basic-filter-container label {
+    color: var(--wandr-admin-muted);
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-basic-filter-container .form-control,
+body.lw-public-admin-mode.lw-admin-section .lw-basic-filter-container .custom-select {
+    background: var(--wandr-admin-bg);
+    border: 1px solid var(--wandr-admin-border);
+    color: var(--wandr-admin-text);
+    border-radius: 8px;
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-premium-user-btn {
+    border-radius: 10px;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+body.lw-public-admin-mode.lw-admin-section .card {
+    background: var(--wandr-admin-surface);
+    border: 1px solid var(--wandr-admin-border) !important;
+    border-radius: var(--wandr-admin-radius);
+    box-shadow: var(--wandr-admin-shadow);
+}
+
+body.lw-public-admin-mode.lw-admin-section .card .card-header {
+    background: rgba(131, 56, 236, 0.1) !important;
+    border-bottom: 1px solid var(--wandr-admin-border) !important;
+    color: #fff !important;
+}
+
+body.lw-public-admin-mode.lw-admin-section .card .card-body {
+    background: transparent;
+    color: var(--wandr-admin-text);
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-profile-image-card-container {
+    background: var(--wandr-admin-surface);
+    border: 1px solid var(--wandr-admin-border);
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-profile-image-card-container .card-body {
+    background: transparent;
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-contains-profile-fields h4,
+body.lw-public-admin-mode.lw-admin-section .lw-contains-profile-fields .card-header h4,
+body.lw-public-admin-mode.lw-admin-section .lw-contains-profile-fields .card-header h5 {
+    color: #fff !important;
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-contains-profile-fields .text-success {
+    color: var(--wandr-pink-light) !important;
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-contains-profile-fields .text-danger {
+    color: #f87171 !important;
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-contains-profile-fields .text-warning {
+    color: #fbbf24 !important;
+}
+
+body.lw-public-admin-mode.lw-admin-section .form-control {
+    background: var(--wandr-admin-bg);
+    border: 1px solid var(--wandr-admin-border);
+    color: var(--wandr-admin-text);
+    border-radius: 8px;
+}
+
+body.lw-public-admin-mode.lw-admin-section .form-control:focus {
+    background: var(--wandr-admin-bg);
+    border-color: var(--wandr-purple);
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(131, 56, 236, 0.25);
+}
+
+body.lw-public-admin-mode.lw-admin-section .modal-content {
+    background: var(--wandr-admin-surface);
+    border: 1px solid var(--wandr-admin-border);
+    color: var(--wandr-admin-text);
+}
+
+body.lw-public-admin-mode.lw-admin-section .modal-header {
+    border-bottom-color: var(--wandr-admin-border);
+    color: #fff;
+}
+
+body.lw-public-admin-mode.lw-admin-section .modal-footer {
+    border-top-color: var(--wandr-admin-border);
+}
+
+body.lw-public-admin-mode.lw-admin-section .scroll-to-top {
+    background: linear-gradient(135deg, var(--wandr-purple) 0%, var(--wandr-pink) 100%);
+    border: none;
+}
+
+body.lw-public-admin-mode.lw-admin-section .dropdown-list .dropdown-header {
+    background: rgba(131, 56, 236, 0.2);
+    color: #fff;
+    border-bottom: 1px solid var(--wandr-admin-border);
+}
+
+body.lw-public-admin-mode.lw-admin-section .dropdown-item {
+    color: var(--wandr-admin-text);
+}
+
+body.lw-public-admin-mode.lw-admin-section .dropdown-item:hover {
+    background: rgba(131, 56, 236, 0.25);
+    color: #fff;
+}
+
+body.lw-public-admin-mode.lw-admin-section .text-secondary {
+    color: var(--wandr-admin-muted) !important;
+}
+
+body.lw-public-admin-mode.lw-admin-section .text-primary,
+body.lw-public-admin-mode.lw-admin-section a.text-primary {
+    color: var(--wandr-pink-light) !important;
+}
+
+body.lw-public-admin-mode.lw-admin-section .lw-user-text-link {
+    color: var(--wandr-pink-light) !important;
 }
 
 /* Manage pages tables (Gifts, Users, etc.) */

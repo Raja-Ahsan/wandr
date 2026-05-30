@@ -91,6 +91,8 @@ class Authenticate
                         'user.get_profile_data',
                         'user.read.search_static_cities',
                         'user.write.store_city',
+                        'user.write.wizard_country_city',
+                        'user.write.wizard_coordinates',
                     ])) {
                         if ($request->ajax()) {
                             return __apiResponse([

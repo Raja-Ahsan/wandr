@@ -1,40 +1,15 @@
-<?php
-$firstParaMsg =  __tr("Please use the following OTP to log in to your account");
-?>
-<table cellspacing="0" cellpadding="0" width="600" class="w320" style="border-collapse: collapse !important; font-family: Helvetica, Arial, sans-serif;">
-	<tbody>
-		<tr style="font-family: Helvetica, Arial, sans-serif;">
-			<td class="header-lg" style="border-collapse: collapse; color: #4d4d4d; font-family: Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 700; line-height: normal; padding: 35px 0 0; text-align: center;">
-				<?=  __tr('Login Your Account!') ?>
-			</td>
-		</tr>
-		<tr style="font-family: Helvetica, Arial, sans-serif;">
-			<td class="free-text" style="border-collapse: collapse; color: #777777; font-family: Helvetica, Arial, sans-serif; font-size: 18px; line-height: 21px; padding: 10px 60px 0px; text-align: center; width: 100% !important;">
-				<?= e($firstParaMsg) ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="mini-container-right" style="border-collapse: collapse; color: #777777; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 21px; padding: 10px 14px 10px 15px; text-align: center; width: 278px;">
-				<table cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important; font-family: Helvetica, Arial, sans-serif;">
-					<tbody>
-						<tr style="font-family: Helvetica, Arial, sans-serif;">
-							<td class="mini-block-padding" style="border-collapse: collapse; color: #777777; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 21px; text-align: center;">
-								<table cellspacing="0" cellpadding="0" width="100%" style="border-collapse: collapse !important; font-family: Helvetica, Arial, sans-serif;">
-									<tbody>
-										<tr style="font-family: Helvetica, Arial, sans-serif;">
-											<td class="mini-block" style="background-color: #ffffff; border: 1px solid #e5e5e5; border-collapse: collapse; border-radius: 5px; color: #777777; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 21px; padding: 12px 15px 15px; text-align: center; width: 253px;">
-												<span class="header-sm" style="color: #4d4d4d; font-family : Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; line-height: 1.3; padding: 5px 0;"> <?=  __tr('Login Details') ?></span><br style="font-family:Helvetica, Arial, sans-serif;">
-												<strong><?=  __tr('Your OTP is :') ?> </strong><?= e($otp) ?><br>
-												<strong><?=  __tr('Email :') ?> </strong> <a href="<?= e($email) ?>" style="color: #2ba6cb; text-decoration: none;"><?= e($email) ?></a>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</td>
-		</tr>
-	</tbody>
-</table>
+<tr>
+    <td align="center" style="padding:32px;background:#16102a;color:#e8dff5;font-family:Arial,sans-serif;">
+        <h1 style="margin:0 0 16px;color:#fff;font-size:24px;">{{ __tr('Your login code') }}</h1>
+
+        <p style="margin:0 0 16px;font-size:15px;">{{ __tr('Use this OTP to log in:') }}</p>
+
+        <p style="margin:0 0 24px;font-size:32px;font-weight:bold;color:#DF0D78;letter-spacing:4px;">
+            {{ $otp }}
+        </p>
+
+        <p style="margin:0;font-size:14px;">
+            <strong>{{ __tr('Email') }}:</strong> {{ $email }}
+        </p>
+    </td>
+</tr>

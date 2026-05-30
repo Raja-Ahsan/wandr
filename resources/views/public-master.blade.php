@@ -1,7 +1,7 @@
 <!-- include header -->
 @include('includes.header')
 <!-- /include header -->
-<body id="page-top" class="lw-page-bg lw-public-master{{ (isLoggedIn() && isAdmin()) ? ' lw-admin-section lw-public-admin-mode' : '' }}">
+<body id="page-top" class="lw-page-bg lw-public-master{{ isLoggedIn() ? ' lw-admin-section lw-public-admin-mode' : '' }}">
     <!-- Page Wrapper -->
     <div id="wrapper" class="container-fluid px-0">
         <!-- include sidebar -->
@@ -11,7 +11,7 @@
         <!-- /include sidebar -->
 
         <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column lw-page-bg">
+        <div id="content-wrapper" class="d-flex flex-column lw-page-bg{{ isLoggedIn() ? ' lw-admin-content-wrap' : '' }}">
             <div id="content">
                 <!-- include top bar -->
                 @if(isLoggedIn())

@@ -6,7 +6,6 @@
                         '__storeName__' => getStoreSettings('name'),
                         '__copyrightYear__' => date('Y')
                     ]) ?> </span>
-            <a href="<?= route('user.read.contact') ?>" class="pl-1"><?= __tr('Contact') ?></a>
         </div>
     </div>
 </footer>
@@ -92,6 +91,8 @@
     })();
 </script>
 <?= __yesset([
+    'dist/css/lw-swal-fix.css',
+    'dist/js/lw-ajax-swal.js',
     'dist/js/common-app*.js'
 ], true) ?>
 <script>

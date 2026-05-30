@@ -13,6 +13,7 @@ use App\Yantrana\Components\UserSetting\Interfaces\UserSettingEngineInterface;
 use App\Yantrana\Components\UserSetting\Repositories\UserSettingRepository;
 use App\Yantrana\Support\CommonTrait;
 use App\Yantrana\Support\Country\Repositories\CountryRepository;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class UserSettingEngine extends BaseEngine implements UserSettingEngineInterface
@@ -565,6 +566,111 @@ class UserSettingEngine extends BaseEngine implements UserSettingEngineInterface
     }
 
     /**
+     * Store Wandr profile extras (interests, travel, events, gifts) in user_profiles.__data.
+     *
+     * @param  array  $inputData
+     * @return array
+     *---------------------------------------------------------------- */
+    public function processStoreWandrProfileExtras($inputData)
+    {
+        $userId = getUserID();
+        $userProfile = $this->userSettingRepository->fetchUserProfile($userId);
+
+        if (__isEmpty($userProfile)) {
+            return $this->engineReaction(18, null, __tr('User profile not found.'));
+        }
+
+        $wandrConfig = config('wandr-profile');
+        $wandrExtras = getWandrProfileExtras($userProfile);
+        $section = $inputData['wandr_section'] ?? 'all';
+
+        if ($section === 'interests' || $section === 'all') {
+            $interests = [];
+            if (! empty($inputData['interests']) && is_array($inputData['interests'])) {
+                foreach ($inputData['interests'] as $interestKey) {
+                    $interests[] = $wandrConfig['interest_suggestions'][$interestKey] ?? $interestKey;
+                }
+            }
+            if (! empty($inputData['custom_interests'])) {
+                $custom = array_filter(array_map('trim', explode(',', $inputData['custom_interests'])));
+                $interests = array_merge($interests, $custom);
+            }
+            $wandrExtras['interests'] = array_values(array_unique(array_filter($interests)));
+        }
+
+        if ($section === 'travel' || $section === 'all') {
+            $travelExperiences = [];
+            if (! empty($inputData['travel_destination']) && is_array($inputData['travel_destination'])) {
+                foreach ($inputData['travel_destination'] as $index => $destination) {
+                    $destination = trim($destination);
+                    if ($destination === '') {
+                        continue;
+                    }
+                    $travelExperiences[] = [
+                        'destination' => $destination,
+                        'year' => trim($inputData['travel_year'][$index] ?? ''),
+                        'description' => trim($inputData['travel_description'][$index] ?? ''),
+                    ];
+                }
+            }
+            $wandrExtras['travel_experiences'] = $travelExperiences;
+        }
+
+        if ($section === 'events' || $section === 'all') {
+            $wandrExtras['event_preferences'] = [
+                'types' => ! empty($inputData['event_types']) && is_array($inputData['event_types'])
+                    ? array_values($inputData['event_types'])
+                    : [],
+                'frequency' => trim($inputData['event_frequency'] ?? ''),
+                'budget' => trim($inputData['event_budget'] ?? ''),
+                'notes' => trim($inputData['event_notes'] ?? ''),
+            ];
+        }
+
+        if ($section === 'gifts' || $section === 'all') {
+            $wandrExtras['gift_preferences'] = [
+                'categories' => ! empty($inputData['gift_categories']) && is_array($inputData['gift_categories'])
+                    ? array_values($inputData['gift_categories'])
+                    : [],
+                'occasions' => ! empty($inputData['gift_occasions']) && is_array($inputData['gift_occasions'])
+                    ? array_values($inputData['gift_occasions'])
+                    : [],
+                'notes' => trim($inputData['gift_notes'] ?? ''),
+            ];
+        }
+
+        if ($this->userSettingRepository->updateUserProfile($userProfile, [
+            '__data' => encodeWandrProfileExtras($userProfile, $wandrExtras),
+        ])) {
+            $user = $this->userSettingRepository->fetchUserDetails($userId);
+            activityLog($user->first_name.' '.$user->last_name.' updated Wandr profile details.');
+
+            $savedSection = $inputData['wandr_section'] ?? 'all';
+            $formKeys = wandrProfileSectionFormKeys();
+            $staticContainerIds = [
+                'interests' => 'lwWandrInterestsStaticContainer',
+                'travel' => 'lwWandrTravelStaticContainer',
+                'events' => 'lwWandrEventsStaticContainer',
+                'gifts' => 'lwWandrGiftsStaticContainer',
+            ];
+            $responseData = [
+                'wandrProfile' => $wandrExtras,
+                'wandr_section' => $savedSection,
+            ];
+
+            if ($savedSection !== 'all' && isset($formKeys[$savedSection], $staticContainerIds[$savedSection])) {
+                $responseData['static_html'] = renderWandrProfileSectionStaticHtml($savedSection, $wandrExtras);
+                $responseData['static_container_id'] = $staticContainerIds[$savedSection];
+                $responseData['form_key'] = $formKeys[$savedSection];
+            }
+
+            return $this->engineReaction(1, $responseData, __tr('Profile updated successfully.'));
+        }
+
+        return $this->engineReaction(2, null, __tr('Something went wrong on server.'));
+    }
+
+    /**
      * Prepare user photo settings.
      *
      * @return json object
@@ -757,6 +863,213 @@ class UserSettingEngine extends BaseEngine implements UserSettingEngineInterface
         }
 
         // check if user profile stored or update
+        if ($isUserLocationUpdated) {
+            return $this->engineReaction(1, [
+                'country_name' => $countryName,
+                'city' => $cityName,
+            ], __tr('Location stored successfully.'));
+        }
+
+        return $this->engineReaction(2, null, __tr('Something went wrong on server.'));
+    }
+
+    /**
+     * Store wizard location using country + city (free geocoding, no Google API).
+     *
+     * @param  array  $inputData
+     * @return json object
+     *---------------------------------------------------------------- */
+    public function processStoreWizardCountryCity($inputData)
+    {
+        $countryId = $inputData['country_id'] ?? null;
+        $cityName = trim($inputData['city'] ?? '');
+
+        if (__isEmpty($countryId) or $cityName === '') {
+            return $this->engineReaction(2, null, __tr('Please select a country and enter your city.'));
+        }
+
+        $countryDetails = $this->countryRepository->fetchById($countryId);
+
+        if (__isEmpty($countryDetails)) {
+            return $this->engineReaction(18, null, __tr('Country not found'));
+        }
+
+        $coordinates = $this->geocodeLocationWithNominatim($cityName.', '.$countryDetails->name);
+
+        if (__isEmpty($coordinates)) {
+            return $this->engineReaction(18, null, __tr('Could not find coordinates for this location. Try a different city name or use current location.'));
+        }
+
+        return $this->saveWizardLocation(
+            $countryDetails->_id,
+            $cityName,
+            $coordinates['latitude'],
+            $coordinates['longitude'],
+            $countryDetails->name
+        );
+    }
+
+    /**
+     * Store wizard location from browser coordinates (free, no Google API).
+     *
+     * @param  array  $inputData
+     * @return json object
+     *---------------------------------------------------------------- */
+    public function processStoreWizardCoordinates($inputData)
+    {
+        $latitude = $inputData['latitude'] ?? null;
+        $longitude = $inputData['longitude'] ?? null;
+
+        if (__isEmpty($latitude) or __isEmpty($longitude)) {
+            return $this->engineReaction(2, null, __tr('Invalid data proceed.'));
+        }
+
+        $latitude = floatval($latitude);
+        $longitude = floatval($longitude);
+
+        if ($latitude < -90 or $latitude > 90 or $longitude < -180 or $longitude > 180) {
+            return $this->engineReaction(2, null, __tr('Invalid data proceed.'));
+        }
+
+        $cityName = '';
+        $countryId = null;
+        $countryName = '';
+
+        $reverseData = $this->reverseGeocodeWithNominatim($latitude, $longitude);
+
+        if (! __isEmpty($reverseData)) {
+            $cityName = $reverseData['city'] ?? '';
+            $countryCode = $reverseData['country_code'] ?? '';
+
+            if (! __isEmpty($countryCode)) {
+                $countryDetails = $this->countryRepository->fetchByCountryCode($countryCode);
+
+                if (! __isEmpty($countryDetails)) {
+                    $countryId = $countryDetails->_id;
+                    $countryName = $countryDetails->name;
+                }
+            }
+        }
+
+        return $this->saveWizardLocation($countryId, $cityName, $latitude, $longitude, $countryName);
+    }
+
+    /**
+     * Geocode via OpenStreetMap Nominatim (free, no billing).
+     *
+     * @param  string  $query
+     * @return array|null
+     *---------------------------------------------------------------- */
+    protected function geocodeLocationWithNominatim($query)
+    {
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => getStoreSettings('name').' ('.config('app.url').')',
+            ])->timeout(10)->get('https://nominatim.openstreetmap.org/search', [
+                'q' => $query,
+                'format' => 'json',
+                'limit' => 1,
+            ]);
+
+            if (! $response->successful()) {
+                return null;
+            }
+
+            $results = $response->json();
+
+            if (__isEmpty($results) or ! isset($results[0]['lat'], $results[0]['lon'])) {
+                return null;
+            }
+
+            return [
+                'latitude' => floatval($results[0]['lat']),
+                'longitude' => floatval($results[0]['lon']),
+            ];
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Reverse geocode via Nominatim.
+     *
+     * @param  float  $latitude
+     * @param  float  $longitude
+     * @return array|null
+     *---------------------------------------------------------------- */
+    protected function reverseGeocodeWithNominatim($latitude, $longitude)
+    {
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => getStoreSettings('name').' ('.config('app.url').')',
+            ])->timeout(10)->get('https://nominatim.openstreetmap.org/reverse', [
+                'lat' => $latitude,
+                'lon' => $longitude,
+                'format' => 'json',
+            ]);
+
+            if (! $response->successful()) {
+                return null;
+            }
+
+            $result = $response->json();
+            $address = $result['address'] ?? [];
+
+            return [
+                'city' => $address['city'] ?? ($address['town'] ?? ($address['village'] ?? ($address['state'] ?? ''))),
+                'country_code' => $address['country_code'] ?? '',
+            ];
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Persist wizard location on user profile.
+     *
+     * @param  int|null  $countryId
+     * @param  string  $cityName
+     * @param  float  $latitude
+     * @param  float  $longitude
+     * @param  string  $countryName
+     * @return json object
+     *---------------------------------------------------------------- */
+    protected function saveWizardLocation($countryId, $cityName, $latitude, $longitude, $countryName = '')
+    {
+        $userId = getUserID();
+        $user = $this->userSettingRepository->fetchUserDetails($userId);
+
+        if (\__isEmpty($user)) {
+            return $this->engineReaction(18, null, __tr('User does not exists.'));
+        }
+
+        $userProfileDetails = [
+            'location_latitude' => $latitude,
+            'location_longitude' => $longitude,
+            'city' => $cityName,
+        ];
+
+        if (! __isEmpty($countryId)) {
+            $userProfileDetails['countries__id'] = $countryId;
+        }
+
+        $userProfile = $this->userSettingRepository->fetchUserProfile($userId);
+        $isUserLocationUpdated = false;
+
+        if (\__isEmpty($userProfile)) {
+            $userProfileDetails['user_id'] = $userId;
+
+            if ($this->userSettingRepository->storeUserProfile($userProfileDetails)) {
+                activityLog($user->first_name.' '.$user->last_name.' store own location.');
+                $isUserLocationUpdated = true;
+            }
+        } else {
+            if ($this->userSettingRepository->updateUserProfile($userProfile, $userProfileDetails)) {
+                activityLog($user->first_name.' '.$user->last_name.' update own location.');
+                $isUserLocationUpdated = true;
+            }
+        }
+
         if ($isUserLocationUpdated) {
             return $this->engineReaction(1, [
                 'country_name' => $countryName,

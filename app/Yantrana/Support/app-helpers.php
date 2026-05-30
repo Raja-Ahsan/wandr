@@ -448,6 +448,196 @@ if (! function_exists('getStoreSettings')) {
 }
 
 /**
+ * Logo for emails (embedded base64 so it works in YOPmail/Gmail on localhost too).
+ *
+ * @return string|null
+ *---------------------------------------------------------------- */
+if (! function_exists('getEmailLogoEmbedSrc')) {
+    function getEmailLogoEmbedSrc()
+    {
+        $logoFile = public_path('imgs/logo.png');
+
+        if (is_file($logoFile)) {
+            return 'data:image/png;base64,'.base64_encode(file_get_contents($logoFile));
+        }
+
+        return null;
+    }
+}
+
+/**
+ * Default Wandr extended profile structure.
+ *
+ * @return array
+ *---------------------------------------------------------------- */
+if (! function_exists('defaultWandrProfileExtras')) {
+    function defaultWandrProfileExtras()
+    {
+        return [
+            'interests' => [],
+            'travel_experiences' => [],
+            'event_preferences' => [
+                'types' => [],
+                'frequency' => '',
+                'budget' => '',
+                'notes' => '',
+            ],
+            'gift_preferences' => [
+                'categories' => [],
+                'occasions' => [],
+                'notes' => '',
+            ],
+        ];
+    }
+}
+
+/**
+ * Read Wandr profile extras from user_profiles.__data JSON.
+ *
+ * @param  object|null  $userProfile
+ * @return array
+ *---------------------------------------------------------------- */
+if (! function_exists('getWandrProfileExtras')) {
+    function getWandrProfileExtras($userProfile)
+    {
+        $defaults = defaultWandrProfileExtras();
+
+        if (__isEmpty($userProfile) || empty($userProfile->__data)) {
+            return $defaults;
+        }
+
+        $decoded = json_decode($userProfile->__data, true);
+
+        if (! is_array($decoded) || empty($decoded['wandr']) || ! is_array($decoded['wandr'])) {
+            return $defaults;
+        }
+
+        return array_replace_recursive($defaults, $decoded['wandr']);
+    }
+}
+
+/**
+ * Merge Wandr extras into user_profiles.__data for storage.
+ *
+ * @param  object|null  $userProfile
+ * @param  array  $wandrExtras
+ * @return string
+ *---------------------------------------------------------------- */
+if (! function_exists('encodeWandrProfileExtras')) {
+    function encodeWandrProfileExtras($userProfile, array $wandrExtras)
+    {
+        $payload = [];
+
+        if (! __isEmpty($userProfile) && ! empty($userProfile->__data)) {
+            $decoded = json_decode($userProfile->__data, true);
+            if (is_array($decoded)) {
+                $payload = $decoded;
+            }
+        }
+
+        $payload['wandr'] = array_replace_recursive(defaultWandrProfileExtras(), $wandrExtras);
+
+        return json_encode($payload);
+    }
+}
+
+/**
+ * Wandr profile section → edit form key (profile page JS).
+ *
+ * @return array
+ *---------------------------------------------------------------- */
+if (! function_exists('wandrProfileSectionFormKeys')) {
+    function wandrProfileSectionFormKeys()
+    {
+        return [
+            'interests' => 'WandrInterests',
+            'travel' => 'WandrTravel',
+            'events' => 'WandrEvents',
+            'gifts' => 'WandrGifts',
+        ];
+    }
+}
+
+/**
+ * Display variables for Wandr profile static partials.
+ *
+ * @param  array  $wandr
+ * @param  array|null  $wandrConfig
+ * @return array
+ *---------------------------------------------------------------- */
+if (! function_exists('wandrProfileDisplayData')) {
+    function wandrProfileDisplayData(array $wandr, $wandrConfig = null)
+    {
+        $wandrConfig = $wandrConfig ?: config('wandr-profile');
+        $ep = $wandr['event_preferences'] ?? [];
+        $gp = $wandr['gift_preferences'] ?? [];
+
+        $eventTypesDisplay = '-';
+        if (! empty($ep['types'])) {
+            $eventTypesDisplay = implode(', ', array_map(function ($key) use ($wandrConfig) {
+                return __tr($wandrConfig['event_types'][$key] ?? $key);
+            }, $ep['types']));
+        }
+
+        $giftCategoriesDisplay = '-';
+        if (! empty($gp['categories'])) {
+            $giftCategoriesDisplay = implode(', ', array_map(function ($key) use ($wandrConfig) {
+                return __tr($wandrConfig['gift_categories'][$key] ?? $key);
+            }, $gp['categories']));
+        }
+
+        $giftOccasionsDisplay = '-';
+        if (! empty($gp['occasions'])) {
+            $giftOccasionsDisplay = implode(', ', array_map(function ($key) use ($wandrConfig) {
+                return __tr($wandrConfig['gift_occasions'][$key] ?? $key);
+            }, $gp['occasions']));
+        }
+
+        return [
+            'wandr' => $wandr,
+            'wandrConfig' => $wandrConfig,
+            'interestsDisplay' => ! empty($wandr['interests']) ? implode(', ', $wandr['interests']) : '-',
+            'eventTypesDisplay' => $eventTypesDisplay,
+            'eventFrequencyDisplay' => ! empty($ep['frequency'])
+                ? __tr($wandrConfig['event_frequency'][$ep['frequency']] ?? $ep['frequency'])
+                : '-',
+            'eventBudgetDisplay' => ! empty($ep['budget'])
+                ? __tr($wandrConfig['event_budget'][$ep['budget']] ?? $ep['budget'])
+                : '-',
+            'eventNotesDisplay' => ! empty($ep['notes']) ? $ep['notes'] : '-',
+            'giftCategoriesDisplay' => $giftCategoriesDisplay,
+            'giftOccasionsDisplay' => $giftOccasionsDisplay,
+            'giftNotesDisplay' => ! empty($gp['notes']) ? $gp['notes'] : '-',
+        ];
+    }
+}
+
+/**
+ * Render inner HTML for a Wandr profile static block (AJAX refresh).
+ *
+ * @param  string  $section
+ * @param  array  $wandr
+ * @return string
+ *---------------------------------------------------------------- */
+if (! function_exists('renderWandrProfileSectionStaticHtml')) {
+    function renderWandrProfileSectionStaticHtml($section, array $wandr)
+    {
+        $views = [
+            'interests' => 'user.profile.partials.wandr-static.interests',
+            'travel' => 'user.profile.partials.wandr-static.travel',
+            'events' => 'user.profile.partials.wandr-static.events',
+            'gifts' => 'user.profile.partials.wandr-static.gifts',
+        ];
+
+        if (! isset($views[$section])) {
+            return '';
+        }
+
+        return view($views[$section], wandrProfileDisplayData($wandr))->render();
+    }
+}
+
+/**
  * get user setting items
  *
  * @param  string  $name

@@ -445,6 +445,17 @@ Route::group([
                     'as' => 'user.write.location_data',
                     'uses' => 'UserSettingController@processLocationData',
                 ]);
+
+                // Wizard location fallbacks (empty static cities DB or manual entry)
+                Route::post('/store-wizard-country-city', [
+                    'as' => 'user.write.wizard_country_city',
+                    'uses' => 'UserSettingController@processStoreWizardCountryCity',
+                ]);
+
+                Route::post('/store-wizard-coordinates', [
+                    'as' => 'user.write.wizard_coordinates',
+                    'uses' => 'UserSettingController@processStoreWizardCoordinates',
+                ]);
                 // Store User Profile Image
                 Route::post('/upload-profile-image', [
                     'as' => 'user.upload_profile_image',
@@ -459,6 +470,10 @@ Route::group([
                 Route::post('/process-profile-setting', [
                     'as' => 'user.write.profile_setting',
                     'uses' => 'UserSettingController@processUserProfileSetting',
+                ]);
+                Route::post('/process-wandr-profile-extras', [
+                    'as' => 'user.write.wandr_profile_extras',
+                    'uses' => 'UserSettingController@processWandrProfileExtras',
                 ]);
                 // Upload multiple hotos
                 Route::post('/upload-photos', [

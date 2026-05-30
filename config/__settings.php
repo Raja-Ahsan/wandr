@@ -37,7 +37,7 @@ return [
                 'key' => 'name',
                 'data_type' => 1,    // string,
                 'placeholder' => 'Your Website Name',
-                'default' => 'loveria',
+                'default' => 'Wandr',
             ],
             'business_email' => [
                 'key' => 'business_email',
@@ -77,7 +77,7 @@ return [
             'activation_required_for_new_user' => [
                 'key' => 'activation_required_for_new_user',
                 'data_type' => 2,    // bool
-                'default' => false,
+                'default' => true,
             ],
             'activation_required_for_change_email' => [
                 'key' => 'activation_required_for_change_email',

@@ -114,17 +114,36 @@
 								<div style="width: 100%; height: 100%" id="address-map"></div>
 							</div>
 						</div>
-						@elseif(getStoreSettings('use_static_city_data'))
+						@elseif(getStoreSettings('use_static_city_data') and ($wizardLocationData['hasStaticCities'] ?? false))
 						<div class="form-group">
 							<label for="selectLocationCity"><?= __tr('Location') ?></label>
 							<input type="text" id="selectLocationCity" class="form-control lw-location-color" placeholder="<?= __tr('Enter a location') ?>">
+							<small class="form-text text-muted"><?= __tr('Type at least 2 characters, then pick a city from the list.') ?></small>
 						</div>
 						@else
-						<!-- info message -->
-						<div class="alert alert-info">
-							<?= __tr('Something went wrong with Google Api Key, please contact to system administrator.') ?>
+						@php
+							$wizardCountries = $wizardLocationData['countries'] ?? [];
+						@endphp
+						<div class="alert alert-info mb-3">
+							<?= __tr('No Google API required. Select your country and city, or use your device location.') ?>
 						</div>
-						<!-- / info message -->
+						<div class="form-group">
+							<label for="lwWizardCountry"><?= __tr('Country') ?></label>
+							<select id="lwWizardCountry" class="form-control">
+								<option value=""><?= __tr('Select country') ?></option>
+								@foreach($wizardCountries as $country)
+								<option value="<?= $country['id'] ?>"><?= $country['name'] ?></option>
+								@endforeach
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="lwWizardCity"><?= __tr('City') ?></label>
+							<input type="text" id="lwWizardCity" class="form-control" placeholder="<?= __tr('Enter your city') ?>">
+						</div>
+						<div class="form-group">
+							<button type="button" class="btn btn-primary" id="lwSaveWizardCountryCity"><?= __tr('Save location') ?></button>
+							<button type="button" class="btn btn-outline-primary ml-2" id="lwUseCurrentLocation"><?= __tr('Use my current location') ?></button>
+						</div>
 						@endif
 					</div>
 				</div>
@@ -359,7 +378,7 @@
 		});
 	};
 
-	@if(!getStoreSettings('allow_google_map') and getStoreSettings('use_static_city_data'))
+	@if(!getStoreSettings('allow_google_map') and getStoreSettings('use_static_city_data') and ($wizardLocationData['hasStaticCities'] ?? false))
 	$('#selectLocationCity').selectize({
 		// plugins: ['restore_on_backspace'],
 		valueField: 'id',
@@ -407,6 +426,53 @@
 				}
 			});
 		}
+	});
+	@endif
+
+	@if(!getStoreSettings('allow_google_map') and (!getStoreSettings('use_static_city_data') or !($wizardLocationData['hasStaticCities'] ?? false)))
+	function onWizardLocationSaved(responseData) {
+		if (responseData.reaction == 1) {
+			_.defer(function() {
+				checkProfileStatus();
+			});
+		}
+	}
+
+	$('#lwSaveWizardCountryCity').on('click', function() {
+		var countryId = $('#lwWizardCountry').val();
+		var city = $('#lwWizardCity').val().trim();
+
+		if (!countryId || !city) {
+			alert("<?= __tr('Please select a country and enter your city.') ?>");
+			return;
+		}
+
+		__DataRequest.post("<?= route('user.write.wizard_country_city') ?>", {
+			'country_id': countryId,
+			'city': city
+		}, onWizardLocationSaved);
+	});
+
+	$('#lwUseCurrentLocation').on('click', function() {
+		if (!navigator.geolocation) {
+			alert("<?= __tr('Geolocation is not supported by your browser.') ?>");
+			return;
+		}
+
+		$('#lwUseCurrentLocation').prop('disabled', true);
+
+		navigator.geolocation.getCurrentPosition(function(position) {
+			__DataRequest.post("<?= route('user.write.wizard_coordinates') ?>", {
+				'latitude': position.coords.latitude,
+				'longitude': position.coords.longitude
+			}, function(responseData) {
+				$('#lwUseCurrentLocation').prop('disabled', false);
+				onWizardLocationSaved(responseData);
+			});
+		}, function() {
+			$('#lwUseCurrentLocation').prop('disabled', false);
+			alert("<?= __tr('Unable to get your location. Please allow location access or enter your city manually.') ?>");
+		});
 	});
 	@endif
 

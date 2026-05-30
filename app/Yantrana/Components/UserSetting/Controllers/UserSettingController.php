@@ -152,6 +152,18 @@ class UserSettingController extends BaseController
     }
 
     /**
+     * Store Wandr profile extras (interests, travel, events, gifts).
+     *
+     * @return json object
+     *---------------------------------------------------------------- */
+    public function processWandrProfileExtras(CommonUnsecuredPostRequest $request)
+    {
+        $processReaction = $this->userSettingEngine->processStoreWandrProfileExtras($request->all());
+
+        return $this->processResponse($processReaction, [], [], true);
+    }
+
+    /**
      * Show user photos view.
      *
      * @return json object
@@ -211,6 +223,34 @@ class UserSettingController extends BaseController
     public function processStoreCity(CommonUnsecuredPostRequest $request)
     {
         $processReaction = $this->userSettingEngine->processStoreCity($request->get('selected_city_id'));
+
+        return $this->responseAction(
+            $this->processResponse($processReaction, [], [], true)
+        );
+    }
+
+    /**
+     * Store wizard location (country + city, no Google API).
+     *
+     * @return json object
+     *---------------------------------------------------------------- */
+    public function processStoreWizardCountryCity(CommonUnsecuredPostRequest $request)
+    {
+        $processReaction = $this->userSettingEngine->processStoreWizardCountryCity($request->all());
+
+        return $this->responseAction(
+            $this->processResponse($processReaction, [], [], true)
+        );
+    }
+
+    /**
+     * Store wizard location from browser GPS (no Google API).
+     *
+     * @return json object
+     *---------------------------------------------------------------- */
+    public function processStoreWizardCoordinates(CommonUnsecuredPostRequest $request)
+    {
+        $processReaction = $this->userSettingEngine->processStoreWizardCoordinates($request->all());
 
         return $this->responseAction(
             $this->processResponse($processReaction, [], [], true)
