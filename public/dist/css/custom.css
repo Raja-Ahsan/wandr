@@ -209,7 +209,6 @@ body.lw-public-master {
 
 body #wrapper #content-wrapper {
     overflow: visible;
-    padding-bottom: 60px
 }
 
 body.lw-colorbox-opened {
@@ -411,10 +410,14 @@ label.lw-validation-error {
     margin: 0;
     height: 112px;
 }
+.form-control {
+    padding: 7px 10px !important;
+    height: auto;
+}
 /* responsive */
 @media (max-width:768px) {
     .sidebar {
-        border-right: 1px solid #3c3c3c
+        border-right: 1px solid #3c3c3c;
     }
 }
 
@@ -599,7 +602,6 @@ form.user .form-control-user {
     .lw-public-master .navbar,
     .lw-public-master .sidebar-brand {
         margin-left: -16px;
-        margin-top: 10px
     }
 
     .lw-public-master .lw-featured-users-block,

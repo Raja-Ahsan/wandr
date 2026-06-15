@@ -41,7 +41,7 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                 <?php foreach ($translationLanguages as $languageId => $language) {
-                    
+
                     if (($languageId == config('CURRENT_LOCALE')) or (isset($language['status']) and $language['status'] == false)) continue;
                 ?>
                     <a class="dropdown-item lw-ajax-link-action" data-callback="__Utils.viewReload" href="<?= route('locale.change', ['localeID' => $languageId]);  ?>">
