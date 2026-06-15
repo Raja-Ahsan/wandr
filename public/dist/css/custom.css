@@ -211,6 +211,11 @@ body #wrapper #content-wrapper {
     overflow: visible;
 }
 
+body.lw-admin-section #wrapper #content-wrapper,
+body.lw-public-admin-mode #wrapper #content-wrapper {
+    overflow: visible;
+}
+
 body.lw-colorbox-opened {
     overflow: hidden
 }
@@ -520,7 +525,7 @@ form.user .form-control-user {
 }
 
 .lw-admin-section .card {
-    overflow: auto
+    overflow: visible
 }
 
 .card .card-header {
@@ -2712,7 +2717,35 @@ body:not(.lw-ajax-form-ready) form.lw-ajax-form:before {
 .topbar .dropdown-menu {
     background-color: rgba(31, 31, 31, .95);
     border: 1px solid rgba(31, 31, 31, .95);
-    border-radius: .35rem
+    border-radius: .35rem;
+    z-index: 1050
+}
+
+.lw-admin-section .topbar,
+.lw-public-admin-mode .topbar {
+    position: relative;
+    z-index: 1035
+}
+
+.lw-admin-section .topbar .dropdown-menu,
+.lw-public-admin-mode .topbar .dropdown-menu,
+.lw-admin-section .topbar .dropdown-list,
+.lw-public-admin-mode .topbar .dropdown-list {
+    z-index: 1040
+}
+
+.lw-admin-section .lw-page-content,
+.lw-public-admin-mode .lw-page-content {
+    position: relative;
+    z-index: 1
+}
+
+.lw-admin-section .dropdown.show,
+.lw-public-admin-mode .dropdown.show,
+.lw-admin-section .btn-group.show,
+.lw-public-admin-mode .btn-group.show {
+    position: relative;
+    z-index: 1051
 }
 
 .dropdown-menu .dropdown-item,

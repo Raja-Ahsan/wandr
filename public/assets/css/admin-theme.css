@@ -882,3 +882,64 @@ body.lw-public-admin-mode.lw-admin-section .lw-user-text-link {
         font-size: 1.35rem;
     }
 }
+
+/* Dropdown stacking — menus must sit above scrollable page content */
+.lw-admin-section #content,
+.lw-public-admin-mode #content {
+    position: relative;
+}
+
+.lw-admin-section #content-wrapper,
+.lw-public-admin-mode #content-wrapper {
+    overflow: visible;
+}
+
+.lw-admin-section .topbar,
+.lw-public-admin-mode .topbar,
+.lw-admin-section .lw-admin-topbar {
+    position: relative;
+    z-index: 1035;
+}
+
+.lw-admin-section .topbar .nav-item.dropdown,
+.lw-public-admin-mode .topbar .nav-item.dropdown {
+    position: relative;
+}
+
+.lw-admin-section .topbar .dropdown-menu,
+.lw-public-admin-mode .topbar .dropdown-menu,
+.lw-admin-section .topbar .dropdown-list,
+.lw-public-admin-mode .topbar .dropdown-list {
+    z-index: 1040;
+}
+
+.lw-admin-section .lw-page-content,
+.lw-public-admin-mode .lw-page-content {
+    position: relative;
+    z-index: 1;
+}
+
+.lw-admin-section .dropdown-menu,
+.lw-public-admin-mode .dropdown-menu {
+    z-index: 1050;
+}
+
+.lw-admin-section .dropdown.show,
+.lw-public-admin-mode .dropdown.show,
+.lw-admin-section .btn-group.show,
+.lw-public-admin-mode .btn-group.show {
+    position: relative;
+    z-index: 1051;
+}
+
+.lw-admin-section .card,
+.lw-public-admin-mode .card {
+    overflow: visible;
+}
+
+.lw-admin-section .table-responsive,
+.lw-public-admin-mode .table-responsive,
+.lw-admin-section div.dataTables_wrapper,
+.lw-public-admin-mode div.dataTables_wrapper {
+    overflow: visible;
+}
