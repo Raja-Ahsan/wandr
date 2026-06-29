@@ -337,6 +337,7 @@ class ManageUserRepository extends BaseRepository
             'location_latitude' => array_get($inputData, 'location_latitude'),
             'location_longitude' => array_get($inputData, 'location_longitude'),
             'is_verified' => array_get($inputData, 'is_verified'),
+            'status' => array_get($inputData, 'status', 1),
         ];
 
         $userProfile = new UserProfile;

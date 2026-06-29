@@ -916,12 +916,11 @@ body.lw-public-admin-mode.lw-admin-section .lw-user-text-link {
 .lw-admin-section .lw-page-content,
 .lw-public-admin-mode .lw-page-content {
     position: relative;
-    z-index: 1;
 }
 
 .lw-admin-section .dropdown-menu,
 .lw-public-admin-mode .dropdown-menu {
-    z-index: 1050;
+    z-index: 1040;
 }
 
 .lw-admin-section .dropdown.show,
@@ -929,7 +928,7 @@ body.lw-public-admin-mode.lw-admin-section .lw-user-text-link {
 .lw-admin-section .btn-group.show,
 .lw-public-admin-mode .btn-group.show {
     position: relative;
-    z-index: 1051;
+    z-index: 1030;
 }
 
 .lw-admin-section .card,
@@ -942,4 +941,19 @@ body.lw-public-admin-mode.lw-admin-section .lw-user-text-link {
 .lw-admin-section div.dataTables_wrapper,
 .lw-public-admin-mode div.dataTables_wrapper {
     overflow: visible;
+}
+
+/* Modals are reparented to body (footer script) — keep Bootstrap default stacking */
+body.modal-open .modal {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+body.modal-open .btn-group.show,
+body.modal-open .dropdown.show {
+    z-index: auto !important;
+}
+
+body .modal .modal-content {
+    pointer-events: auto;
 }

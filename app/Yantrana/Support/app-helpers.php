@@ -1501,7 +1501,7 @@ if (! function_exists('getAgeDate')) {
  *
  *-----------------------------------------------------------------------*/
 if (! function_exists('getUsersAllConversationCount')) {
-    function getUsersAllConversationCount($receiverUserId=null,$optionalLoggedInUserId=null)
+    function getUsersAllConversationCount($receiverUserId=null,$optionalLoggedInUserId=null,$shouldUpdateClientModels=true)
     {
         if($receiverUserId)
         $userId=$receiverUserId;
@@ -1516,9 +1516,11 @@ if (! function_exists('getUsersAllConversationCount')) {
         return $message->status == 2 && $message->users__id == $userId && $message->to_users__id == $userId;// Adjust property access based on your data structure
        });
        $filteredNewMsgCount = $filteredNewMsgCollection->count();
-       updateClientModels([
-        'totalUnreadMsgCount'=> $filteredNewMsgCount > 0 ? $filteredNewMsgCount:'',
-       ]);
+       if ($shouldUpdateClientModels) {
+           updateClientModels([
+            'totalUnreadMsgCount'=> $filteredNewMsgCount > 0 ? $filteredNewMsgCount:'',
+           ]);
+       }
         return $filteredNewMsgCount;
     }
 }

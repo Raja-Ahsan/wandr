@@ -19,7 +19,7 @@
         };
     });
 
-    if ($(window).width() < 768) {
+    if ($(window).width() < 768 && !$('body').hasClass('lw-public-master')) {
         $("body").toggleClass("sidebar-toggled");
         $(".sidebar").toggleClass("toggled");
     };

@@ -348,6 +348,7 @@ class ManageUserEngine extends BaseEngine
             'designation' => $userDetails->designation,
             'mobile_number' => $mobileNumber,
             'status' => $userDetails->status,
+            'status_code' => $userDetails->status,
             'country_code' => $countryPhnCode,
         ];
 
@@ -794,27 +795,42 @@ class ManageUserEngine extends BaseEngine
             return $this->engineReaction(18, ['show_message' => true], __tr('User does not exists.'));
         }
 
-        $profileAddedAndVerified = $profileVerified = false;
-
         $profile = $this->manageUserRepository->fetchUserProfile($userDetails->_id);
+        $profileVerified = false;
+        $userActivated = false;
 
         // check if profile is empty , if true then create profile
         if (__isEmpty($profile)) {
-            if ($this->manageUserRepository->storeUserProfile(['users__id' => $userDetails->_id, 'is_verified' => 1])) {
-                $profileAddedAndVerified = true;
+            if ($this->manageUserRepository->storeUserProfile([
+                'users__id' => $userDetails->_id,
+                'is_verified' => 1,
+                'status' => 1,
+            ])) {
+                $profileVerified = true;
             }
-        } else {
+        } elseif ($profile->is_verified != 1) {
             if ($this->manageUserRepository->updateUserProfile($profile, ['is_verified' => 1])) {
                 $profileVerified = true;
             }
+        } else {
+            $profileVerified = true;
         }
 
-        // check if user added and verified
-        if ($profileAddedAndVerified or $profileVerified) {
-            // Add activity log for user blocked
+        // activate never-activated accounts
+        if ($userDetails->status == 4) {
+            if ($this->manageUserRepository->updateUser($userDetails, ['status' => 1])) {
+                $userActivated = true;
+            }
+        }
+
+        if ($profileVerified && ($userDetails->status != 4 || $userActivated)) {
             activityLog($userDetails->first_name.' '.$userDetails->last_name.' user verified.');
 
-            return $this->engineReaction(1, ['userUid' => $userDetails->_uid], __tr('User verified successfully.'));
+            $message = $userActivated
+                ? __tr('User verified and activated successfully.')
+                : __tr('User verified successfully.');
+
+            return $this->engineReaction(1, ['userUid' => $userDetails->_uid], $message);
         }
 
         return $this->engineReaction(2, ['show_message' => true], __tr('Something went wrong on server.'));

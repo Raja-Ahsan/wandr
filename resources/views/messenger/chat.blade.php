@@ -1,4 +1,10 @@
-<div class="lw-messenger">
+<div class="lw-messenger<?= __isEmpty($messengerUsers) ? ' lw-messenger-no-chats' : '' ?>" id="lwMessengerRoot"
+    data-send-message-url="<?= route('user.write.send_message', ['userId' => 'userId']) ?>"
+    data-buy-sticker-url="<?= route('user.write.buy_stickers') ?>"
+    data-giphy-key="<?= getStoreSettings('giphy_key') ?>"
+    data-logged-in-user-profile-picture="<?= $currentUserData['logged_in_user_profile_picture'] ?>"
+    data-logged-in-user-uid="<?= getUserUID() ?>"
+    data-pusher-app-key="<?= getStoreSettings('pusher_app_key') ?>">
     <div class="row">
         <div class="lw-messenger-sidebar col-md-4 p-0 pl-3 pr-1 ">
             <div class="lw-messenger-header shadow">
@@ -34,45 +40,28 @@
                         <span class="badge badge-pill badge-success lw-incoming-message-count-<?= $messengerUser['user_id'] ?>" data-model="usersUnreadMessageCount<?= $messengerUser['user_id'] ?>"><?= $messengerUser['unreadMsgCount'] ?></span>
                     </a>
                     @endforeach
+                    @else
+                    <div class="lw-messenger-sidebar-empty text-center p-4">
+                        <i class="far fa-comments fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0 small"><?= __tr('No conversations yet') ?></p>
+                    </div>
                     @endif
                     <!-- /Check if messenger users exists -->
                 </div>
             </div>
         </div>
-        <div class="lw-messenger-content col-md-8" id="lwUserConversationContainer"></div>
+        <div class="lw-messenger-content col-md-8" id="lwUserConversationContainer">
+            @if(__isEmpty($messengerUsers))
+            <div class="lw-messenger-empty-state">
+                <div class="lw-messenger-empty-state-inner">
+                    <span class="lw-messenger-empty-icon"><i class="far fa-comments"></i></span>
+                    <h5><?= __tr('Your messages') ?></h5>
+                    <p><?= __tr('To start chatting, visit a profile and tap the message icon.') ?></p>
+                    <a href="<?= route('user.read.find_matches') ?>" id="lwMessengerFindMatchesBtn" class="btn btn-primary btn-sm lw-ajax-link-action lw-action-with-url mt-3" data-title="<?= __tr('Find Matches') ?>">
+                        <i class="fas fa-search mr-1"></i><?= __tr('Find Matches') ?>
+                    </a>
+                </div>
+            </div>
+            @endif
+        </div>
     </div>
-    <script>
-        __Messenger.sendMessageRawUrl = "<?= route('user.write.send_message', ['userId' => 'userId']) ?>";
-        __Messenger.buyStickerUrl = "<?= route('user.write.buy_stickers') ?>";
-        __Messenger.giphyKey = "<?= getStoreSettings('giphy_key') ?>";
-        __Messenger.loggedInUserProfilePicture = "<?= $currentUserData['logged_in_user_profile_picture'] ?>";
-        __Messenger.loggedInUserUid = "<?= getUserUID() ?>";
-        __Messenger.pusherAppKey = "<?= getStoreSettings('pusher_app_key') ?>";
-
-        // Select a list of user chat 
-        var $userListGroup = $('.lw-user-chat-list');
-        // Fire click event on first element
-        $($userListGroup[0]).trigger("click");
-        // Add Active class to first element
-        $($userListGroup[0]).addClass('active');
-        // Click event fire when click on user list
-        $userListGroup.click(function(e) {
-            if ($(this).hasClass('active')) {
-                e.stopPropagation();
-            }
-            $('.lw-messenger-contact-list a.active').removeClass('active');
-            $(this).addClass('active');
-            __Messenger.toggleSidebarOnMobileView();
-            var incomingMsgEl = $('.lw-incoming-message-count-' + $(this).attr('id'));
-            if (!_.isEmpty(incomingMsgEl.text())) {
-                incomingMsgEl.text(null);
-            }
-        });
-        // lwFilterUsers
-        $("#lwFilterUsers").on("keyup", function() {
-            var filterQuery = $(this).val().toLowerCase();
-            $(".lw-messenger-contact-list a").filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(filterQuery) > -1)
-            });
-        });
-    </script>

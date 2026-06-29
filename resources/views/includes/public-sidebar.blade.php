@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+<ul class="navbar-nav sidebar sidebar-dark accordion d-none d-md-block" id="accordionSidebar">
     <!-- Sidebar - Brand -->
    
         <li>
@@ -13,8 +13,9 @@
         </li>
         <div class="sidebar-wrapper">
         <li class="nav-item mt-2 d-sm-block d-md-none">
-            <a href class="nav-link" onclick="getChatMessenger('<?= route('user.read.all_conversation') ?>', true)" id="lwAllMessageChatButton" data-chat-loaded="false" data-toggle="modal" data-target="#messengerDialog">
-                <span class="badge badge-danger badge-counter lw-new-message-badge"></span>
+            <?php $sidebarUnreadMsgCount = getUsersAllConversationCount(); ?>
+            <a href="#" class="nav-link" onclick="getChatMessenger('<?= route('user.read.all_conversation') ?>', true); return false;" id="lwAllMessageChatButton" data-chat-loaded="false">
+                <span class="badge badge-danger badge-counter lw-new-message-badge" data-model="totalUnreadMsgCount"><?= ($sidebarUnreadMsgCount > 0) ? $sidebarUnreadMsgCount : '' ?></span>
                 <i class="far fa-comments"></i>
                 <span><?= __tr('Messenger') ?></span>
             </a>

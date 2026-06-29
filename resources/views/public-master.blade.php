@@ -59,6 +59,9 @@
     </div>
     <!-- include footer -->
     @include('includes.footer')
+    @if(isLoggedIn())
+    @include('includes.public-bottom-nav')
+    @endif
     <!-- /include footer -->
 
     <!-- Scroll to Top Button-->

@@ -1,13 +1,16 @@
 <!-- Topbar -->
-<nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow">
-    <!-- Sidebar Toggle (Topbar) -->
-    <button type="button" id="sidebarToggleTop" class="btn btn-link d-block d-md-none rounded-circle mr-3">
+<nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow lw-public-topbar">
+    <!-- Sidebar Toggle (Topbar) - desktop sidebar only -->
+    <button type="button" id="sidebarToggleTop" class="btn btn-link d-none rounded-circle mr-3 p-0">
         <i class="fa-solid fa-bars"></i>
     </button>
+    <a href="<?= route('home_page') ?>" class="lw-mobile-topbar-brand lw-ajax-link-action lw-action-with-url d-md-none" title="<?= getStoreSettings('name') ?>">
+        <img class="lw-mobile-topbar-logo" src="<?= getStoreSettings('logo_image_url') ?>" alt="<?= getStoreSettings('name') ?>">
+    </a>
     <ul class="navbar-nav ml-0">
         <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-        <li class="nav-item dropdown no-arrow">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <li class="nav-item dropdown no-arrow lw-mobile-topbar-search">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-search fa-sm"></i>&nbsp;<span class="d-md-block d-none"><?= __tr('Find Matches') ?></span>
             </a>
 
@@ -97,15 +100,11 @@
     <!-- /buy premium plans page link -->
     @endif
     <!-- Topbar Navbar -->
-
-    <ul class="navbar-nav" x-data="{ totalUnreadMsgCount: <?= $allUnreadMsgCount  ?> }">
+    <ul class="navbar-nav">
         <li class="nav-item d-none d-sm-none d-md-block">
-            <a class="nav-link" onclick="getChatMessenger('<?= route('user.read.all_conversation') ?>', true)" id="lwAllMessageChatButton" data-chat-loaded="false" data-toggle="modal" data-target="#messengerDialog">
-               <!-- Show the badge only if totalUnreadMsgCount > 0 -->
-               <span class="badge badge-danger badge-counter lw-new-message-badge d-content" x-show="totalUnreadMsgCount > 0" x-cloak>
-                <span class="d-none" x-text="totalUnreadMsgCount"></span>
-            </span>
-               <i class="far fa-comments"></i>
+            <a class="nav-link" href="#" onclick="getChatMessenger('<?= route('user.read.all_conversation') ?>', true); return false;" id="lwAllMessageChatButton" data-chat-loaded="false">
+                <i class="far fa-comments"></i>
+                <span class="badge badge-danger badge-counter lw-new-message-badge" data-model="totalUnreadMsgCount"><?= ($allUnreadMsgCount > 0) ? $allUnreadMsgCount : '' ?></span>
             </a>
         </li>
         <!-- Notification Link -->
@@ -271,7 +270,7 @@
 @lwPush('appScripts')
 <script>
      __DataRequest.updateModels({
-    totalUnreadMsgCount:'<?= $allUnreadMsgCount?>'
+    totalUnreadMsgCount: <?= ($allUnreadMsgCount > 0) ? $allUnreadMsgCount : "''" ?>
    });
     $('#lw-default-featured-users').on('click', function(){
         showConfirmation('', function() {

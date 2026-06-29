@@ -27,7 +27,7 @@
             @endif
             <div class=" lw-messenger-user-menu">
                 <div class="dropdown">
-                    <button class="btn btn-primary rounded-circle dropdown-toggle lw-datatable-action-dropdown-toggle lw-button-width" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn p-0 btn-primary rounded-circle dropdown-toggle lw-datatable-action-dropdown-toggle lw-button-width" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-ellipsis-v lw-fa-ellipsis-v"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">

@@ -552,12 +552,14 @@ class MessengerEngine extends BaseEngine implements MessengerEngineInterface
                      $unreadMsgCount=$msgCount; //unread message count
                  }
              }
-                // Fetch message collection count
+                // Fetch message collection count for sender UI
                 $totalUnreadMsgCount= getUsersAllConversationCount($loggedInUserId,$optionalLoggedInUserId);
+                // Receiver's unread count for real-time badge on their device
+                $receiverTotalUnreadMsgCount = getUsersAllConversationCount($userDetails->_id, $optionalLoggedInUserId, false);
               // Get the count of the filtered collection
                updateClientModels([
                'usersUnreadMessageCount' . $userDetails->_id => '',
-               'totalUnreadMsgCount'=>$totalUnreadMsgCount,
+               'totalUnreadMsgCount'=> $totalUnreadMsgCount > 0 ? $totalUnreadMsgCount : '',
               ]);
                 $storedChatUids = $addedMessagesUid;
                 // check if message send by file upload
@@ -617,7 +619,7 @@ class MessengerEngine extends BaseEngine implements MessengerEngineInterface
                         '__fullName__' => $fullName,
                     ]),
                     'getNotificationList' => getNotificationList($userDetails->_id),
-                    'totalUnreadMsgCount'=>$totalUnreadMsgCount,
+                    'totalUnreadMsgCount'=> $receiverTotalUnreadMsgCount > 0 ? $receiverTotalUnreadMsgCount : '',
                     'usersUnreadMessageCount'=>$unreadMsgCount,
                 ];
                 $receiverUserUids = [];
@@ -1485,7 +1487,7 @@ class MessengerEngine extends BaseEngine implements MessengerEngineInterface
            $totalunreadMsgCount= getUsersAllConversationCount($loggedInUserId,$optionalLoggedInUserId);
            // Get the count of the filtered collection
             updateClientModels([
-            'totalUnreadMsgCount'=>$totalunreadMsgCount,
+            'totalUnreadMsgCount'=> $totalunreadMsgCount > 0 ? $totalunreadMsgCount : '',
            ]);
         return $this->engineResponse(1, null);
     }

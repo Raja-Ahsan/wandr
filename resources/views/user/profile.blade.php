@@ -224,6 +224,20 @@
 			</div>
 			<!-- / Like and dislike buttons -->
 		</div>
+		<div class="card mt-3 lw-profile-mobile-info-card">
+			<div class="card-body">
+				<div class="lw-like-dislike-box lw-profile-info-box">
+					<i class="fas fa-venus-mars fa-2x lw-profile-info-icon mb-2"></i>
+					<div data-model="profileData.gender_text"><?= __ifIsset($userProfileData['gender_text'], $userProfileData['gender_text'], '-') ?></div>
+					<div class="text-muted small mt-1"><?= __tr('Gender') ?></div>
+				</div>
+				<div class="lw-like-dislike-box lw-profile-info-box">
+					<i class="fas fa-heart fa-2x lw-profile-info-icon mb-2"></i>
+					<div data-model="profileData.formatted_relationship_status"><?= __ifIsset($userProfileData['formatted_relationship_status'], $userProfileData['formatted_relationship_status'], '-') ?></div>
+					<div class="text-muted small mt-1"><?= __tr('Relationship Status') ?></div>
+				</div>
+			</div>
+		</div>
 		<div class="card mt-3">
 			<div class="card-header">
 				<?= __tr('Send Message or Gift') ?>

@@ -141,17 +141,25 @@
 </audio>
 <!-- /caller ringtone -->
 <script>
+    function lwUpdateUnreadMessageBadge(count, options) {
+        options = options || {};
+        var parsedCount = parseInt(count, 10);
+        var badgeCount = '';
+
+        if (!isNaN(parsedCount) && parsedCount > 0) {
+            badgeCount = parsedCount;
+        } else if (options.incrementIfMissing) {
+            var currentCount = parseInt($('[data-model="totalUnreadMsgCount"].lw-new-message-badge').first().text(), 10) || 0;
+            badgeCount = currentCount + 1;
+        }
+
+        __DataRequest.updateModels({
+            totalUnreadMsgCount: badgeCount > 0 ? badgeCount : ''
+        });
+    }
+
     //check user loggedIn or not
     if (userLoggedIn && enablePusher) {
-        //if messenger dialog is open then hide new message dot
-        $("#messengerDialog").on('click', function() {
-            var messengerDialogVisibility = $("#messengerDialog").is(':visible');
-            if (!messengerDialogVisibility) {
-                $(".lw-new-message-badge").show();
-            }
-        });
-
-        //subscribe pusher notification
         subscribeNotification('event.user.notification', pusherAppKey, userUid, null, function(responseData) {
             //get notification list
             var requestData = responseData.getNotificationList,
@@ -231,7 +239,7 @@
                 if(!isAdmin){
                   //show new msg badge
                   if ((!messengerDialogVisibility || responseData.userId != currentSelectedUserId)) {
-                $(".lw-new-message-badge").show();
+                lwUpdateUnreadMessageBadge(totalUnreadMsgCount, { incrementIfMissing: true });
                 }
 
                     if (currentSelectedUserUid == responseData.toUserUid) {
@@ -267,7 +275,7 @@
                      //to remove fake user notification from admins public side
                      if(!(responseData.isFake) && (isAdmin) ){
                         if ((!messengerDialogVisibility || responseData.userId != currentSelectedUserId)) {
-                            $(".lw-new-message-badge").show();
+                            lwUpdateUnreadMessageBadge(totalUnreadMsgCount, { incrementIfMissing: true });
                         }
 
                      }
@@ -343,7 +351,7 @@
                 if(responseData.messageRequestStatus == 'MESSAGE_REQUEST_RECEIVED')
             {
                if ((!messengerDialogVisibility || responseData.userId != currentSelectedUserId) ) {
-                $(".lw-new-message-badge").show();
+                lwUpdateUnreadMessageBadge(totalUnreadMsgCount, { incrementIfMissing: true });
                }
             }
                     if (responseData.userId == currentSelectedUserId) {
@@ -375,7 +383,7 @@
                             if(responseData.messageRequestStatus == 'MESSAGE_REQUEST_RECEIVED')
                         {
                         if ((!messengerDialogVisibility || responseData.userId != currentSelectedUserId)) {
-                            $(".lw-new-message-badge").show();
+                            lwUpdateUnreadMessageBadge(totalUnreadMsgCount, { incrementIfMissing: true });
                         }
                         }
 
@@ -446,31 +454,209 @@
     function getChatMessenger(url, isAllChatMessenger) {
         var $allMessageChatButtonEl = $('#lwAllMessageChatButton'),
             $lwMessageChatButtonEl = $('#lwMessageChatButton');
-        // check if request for all messenger 
+
         if (isAllChatMessenger) {
-            var isAllMessengerChatLoaded = $allMessageChatButtonEl.data('chat-loaded');
-            if (!isAllMessengerChatLoaded) {
-                $allMessageChatButtonEl.attr('data-chat-loaded', true);
-                $lwMessageChatButtonEl.attr('data-chat-loaded', false);
-                fetchChatMessages(url);
-            }
-        } else {
-            var isMessengerLoaded = $lwMessageChatButtonEl.data('chat-loaded');
-            if (!isMessengerLoaded) {
-                $lwMessageChatButtonEl.attr('data-chat-loaded', true);
-                $allMessageChatButtonEl.attr('data-chat-loaded', false);
-                fetchChatMessages(url);
-            }
+            $lwMessageChatButtonEl.attr('data-chat-loaded', false);
+            fetchChatMessages(url, true);
+            return;
+        }
+
+        var isMessengerLoaded = $lwMessageChatButtonEl.data('chat-loaded');
+        if (!isMessengerLoaded) {
+            $lwMessageChatButtonEl.attr('data-chat-loaded', true);
+            $allMessageChatButtonEl.attr('data-chat-loaded', false);
+            fetchChatMessages(url, false);
         }
     };
 
+    function lwIsMessengerMobileView() {
+        return window.matchMedia('(max-width: 767px)').matches;
+    }
+
+    function lwApplyMessengerConfig() {
+        var $root = $('#lwMessengerRoot');
+        if (!$root.length || typeof __Messenger === 'undefined') {
+            return;
+        }
+        __Messenger.sendMessageRawUrl = $root.data('sendMessageUrl');
+        __Messenger.buyStickerUrl = $root.data('buyStickerUrl');
+        __Messenger.giphyKey = $root.data('giphyKey');
+        __Messenger.loggedInUserProfilePicture = $root.data('loggedInUserProfilePicture');
+        __Messenger.loggedInUserUid = $root.data('loggedInUserUid');
+        __Messenger.pusherAppKey = $root.data('pusherAppKey');
+    }
+
+    function lwOpenMessengerSidebarOnMobile() {
+        if (!lwIsMessengerMobileView()) {
+            return;
+        }
+        var $messenger = $('#lwMessengerRoot');
+        if ($messenger.length && $messenger.find('.lw-user-chat-list').length) {
+            $messenger.addClass('lw-messenger-sidebar-opened');
+        }
+    }
+
+    function lwCloseMessengerSidebarOnMobile() {
+        $('#lwMessengerRoot').removeClass('lw-messenger-sidebar-opened');
+    }
+
+    function lwBindMessengerGlobalEvents() {
+        if (window.__lwMessengerEventsBound) {
+            return;
+        }
+        window.__lwMessengerEventsBound = true;
+
+        $(document).on('click', '#lwChatSidebarToggle', function(e) {
+            e.preventDefault();
+            if (typeof __Messenger !== 'undefined') {
+                __Messenger.toggleSidebarOnMobileView();
+            }
+        });
+
+        $(document).on('click', '#lwMessengerRoot .lw-user-chat-list', function(e) {
+            if ($(this).hasClass('active')) {
+                e.stopImmediatePropagation();
+                return false;
+            }
+            $('#lwMessengerContent .lw-messenger-contact-list a.active').removeClass('active');
+            $(this).addClass('active');
+            lwCloseMessengerSidebarOnMobile();
+            var incomingMsgEl = $('.lw-incoming-message-count-' + $(this).attr('id'));
+            if (incomingMsgEl.length && incomingMsgEl.text()) {
+                incomingMsgEl.text('');
+            }
+        });
+
+        $(document).on('keyup', '#lwFilterUsers', function() {
+            var filterQuery = $(this).val().toLowerCase();
+            $('#lwMessengerRoot .lw-messenger-contact-list a.lw-user-chat-list').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(filterQuery) > -1);
+            });
+        });
+
+        $('#messengerDialog').on('hidden.bs.modal', function() {
+            lwCloseMessengerSidebarOnMobile();
+        });
+    }
+
+    function lwInitMessengerPanel(options) {
+        options = options || {};
+        lwBindMessengerGlobalEvents();
+        lwApplyMessengerConfig();
+
+        var $messenger = $('#lwMessengerRoot');
+        if (!$messenger.length) {
+            return;
+        }
+
+        var hasChatWindow = $('#lwUserConversationContainer .lw-messenger-chat-window').length > 0;
+        if (lwIsMessengerMobileView() && !hasChatWindow && $messenger.find('.lw-user-chat-list').length) {
+            lwOpenMessengerSidebarOnMobile();
+        }
+
+        if (options.autoSelectFirst) {
+            lwOpenHeaderConversationList();
+        }
+    }
+
+    lwBindMessengerGlobalEvents();
+
+    function lwOpenHeaderConversationList() {
+        var $firstContact = $('#lwMessengerContent .lw-user-chat-list').first();
+        if ($firstContact.length && typeof __DataRequest !== 'undefined') {
+            $('#lwMessengerContent .lw-messenger-contact-list a.active').removeClass('active');
+            $firstContact.addClass('active');
+            __DataRequest.process($firstContact);
+            lwCloseMessengerSidebarOnMobile();
+        }
+    }
+
+    function lwCloseMessengerDialog() {
+        var $dialog = $('#messengerDialog');
+        if (!$dialog.length) {
+            return;
+        }
+        $dialog.modal('hide');
+        $('body').removeClass('modal-open').css('padding-right', '');
+        $('.modal-backdrop').remove();
+    }
+
+    var lwCloseMessengerAfterFindMatches = false;
+
+    $(document).on('click', '.lw-mobile-bottom-nav-item.lw-ajax-link-action', function() {
+        $('.lw-mobile-bottom-nav-item').removeClass('active');
+        $(this).addClass('active');
+        lwCloseMobileNavMorePanel();
+    });
+
+    function lwCloseMobileNavMorePanel() {
+        $('#lwMobileNavMorePanel, #lwMobileNavMoreOverlay').removeClass('lw-open');
+        $('#lwMobileNavMoreBtn').removeClass('active').attr('aria-expanded', 'false');
+        $('#lwMobileNavMorePanel').attr('aria-hidden', 'true');
+    }
+
+    function lwOpenMobileNavMorePanel() {
+        $('#lwMobileNavMorePanel, #lwMobileNavMoreOverlay').addClass('lw-open');
+        $('#lwMobileNavMoreBtn').addClass('active').attr('aria-expanded', 'true');
+        $('#lwMobileNavMorePanel').attr('aria-hidden', 'false');
+    }
+
+    $(document).on('click', '#lwMobileNavMoreBtn', function(e) {
+        e.preventDefault();
+        if ($('#lwMobileNavMorePanel').hasClass('lw-open')) {
+            lwCloseMobileNavMorePanel();
+        } else {
+            lwOpenMobileNavMorePanel();
+        }
+    });
+
+    $(document).on('click', '#lwMobileNavMoreOverlay, #lwMobileNavMoreClose', function() {
+        lwCloseMobileNavMorePanel();
+    });
+
+    $(document).on('click', '.lw-mobile-bottom-nav-more-link', function() {
+        lwCloseMobileNavMorePanel();
+    });
+
+    $(document).on('click', '#messengerDialog #lwMessengerFindMatchesBtn', function() {
+        lwCloseMessengerAfterFindMatches = true;
+    });
+
+    $(document).on('lw_events_ajax_success_replace', function() {
+        if (!lwCloseMessengerAfterFindMatches) {
+            return;
+        }
+        lwCloseMessengerAfterFindMatches = false;
+        lwCloseMessengerDialog();
+    });
+
     // Fetch messages from server
-    function fetchChatMessages(url) {
+    function fetchChatMessages(url, isAllChatMessenger) {
         $('#lwChatDialogLoader').show();
         $('#lwMessengerContent').hide();
-        __DataRequest.get(url, {}, function(responseData) {
-            $('#lwChatDialogLoader').hide();
-            $('#lwMessengerContent').show();
+
+        __DataRequest.get(url, {}, function() {
+            _.defer(function() {
+                $('#lwChatDialogLoader').hide();
+                var hasConversations = $('#lwMessengerContent .lw-user-chat-list').length > 0;
+
+                if (isAllChatMessenger && !hasConversations) {
+                    $('#lwMessengerContent').show();
+                    $('#messengerDialog').modal('show');
+                    lwInitMessengerPanel();
+                    return;
+                }
+
+                $('#lwMessengerContent').show();
+
+                if (isAllChatMessenger) {
+                    $('#messengerDialog').modal('show');
+                }
+
+                lwInitMessengerPanel({
+                    autoSelectFirst: hasConversations
+                });
+            });
         });
     };
 </script>
@@ -502,6 +688,32 @@
                     }
                     }
             });
+</script>
+<script>
+    (function () {
+        function lwReparentModalsToBody() {
+            if (typeof jQuery === 'undefined') {
+                return;
+            }
+            jQuery('#wrapper .modal, #content-wrapper .modal, #content .modal, .lw-page-content .modal').each(function () {
+                if (this.parentElement && this.parentElement !== document.body) {
+                    jQuery(this).appendTo('body');
+                }
+            });
+        }
+
+        if (typeof jQuery !== 'undefined') {
+            jQuery(function () {
+                lwReparentModalsToBody();
+                jQuery(document).on('show.bs.modal', '.modal', function () {
+                    if (this.parentElement && this.parentElement !== document.body) {
+                        jQuery(this).appendTo('body');
+                    }
+                });
+                jQuery(document).on('lw_events_ajax_success_replace lw_events_ajax_start_replace', lwReparentModalsToBody);
+            });
+        }
+    })();
 </script>
 @stack('appScripts')
 <script defer src="https://unpkg.com/alpinejs@3.12.2/dist/cdn.min.js"></script>

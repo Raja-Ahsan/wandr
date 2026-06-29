@@ -195,7 +195,11 @@
 					<a href class="dropdown-item" data-toggle="modal" data-user-uid='<%= __tData._uid %>' data-target="#userTransactionDialog" data-user-name="<%= __tData.full_name %>"><i class="fas fa-hand-holding-usd"  id="lwTransactionDetailBtn"></i> <?= __tr('Transactions') ?></a>
 					<!-- /Transaction Detail Button -->
 
-					<% if(__tData.is_verified != 1) { %>
+					<% if(__tData.status == 4) { %>
+						<!-- Activate never-activated user -->
+						<a class="dropdown-item lw-ajax-link-action" data-callback="onSuccessAction" href="<%= __Utils.apiURL("<?= route('manage.user.write.verify', ['userUid' => 'userUid']) ?>", {'userUid': __tData._uid}) %>" data-method="post"><i class="fas fa-user-check"></i> <?= __tr('Activate') ?></a>
+						<!-- /Activate never-activated user -->
+					<% } else if(!__tData.is_verified) { %>
 						<!-- Verify User -->
 						<a class="dropdown-item lw-ajax-link-action" data-callback="onSuccessAction" href="<%= __Utils.apiURL("<?= route('manage.user.write.verify', ['userUid' => 'userUid']) ?>", {'userUid': __tData._uid}) %>" data-method="post"><i class="fas fa-user-check"></i> <?= __tr('Verify') ?></a>
 						<!-- /Verify User -->
@@ -590,11 +594,28 @@
 		],
 		dataTableInstance;
 
-	// Perform actions after delete / restore / block
+	// Perform actions after delete / restore / block / verify
 	onSuccessAction = function(response) {
-		reloadDT(dataTableInstance);
-
+		if (response.reaction == 1 || response.reaction_code == 1) {
+			reloadDT(dataTableInstance);
+		}
 	};
+
+	// Close datatable action dropdowns so they do not block modal interaction
+	$(document).on('show.bs.modal', '#userEditDialog, #userTransactionDialog, #userAllocateCreditsDialog, #adminLoginDialog', function () {
+		$('.btn-group.show').removeClass('show');
+		$('.dropdown-menu.show').removeClass('show');
+		$('.lw-datatable-action-dropdown-toggle').dropdown('hide');
+		$('.lw-datatable-action-dropdown-toggle').attr('aria-expanded', 'false');
+	});
+
+	// After user edit form submit
+	function onModerateCallback(responseData) {
+		if (responseData.reaction == 1 || responseData.reaction_code == 1) {
+			$('#userEditDialog').modal('hide');
+			reloadDT(dataTableInstance);
+		}
+	}
 
 	//for users list
 	fetchUsers = function() {

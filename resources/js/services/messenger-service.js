@@ -439,9 +439,6 @@ var currentSelectedUserId = null,
     optionalLoggedInUserId = null;
 // After getting response from selected user
 function userChatResponse(responseData) {
-    $(".lw-messenger").unbind();
-    $('#lwChatSidebarToggle').unbind();
-    // $('#lwChatSidebarToggle').unbind();
     if (responseData.reaction == 1) {
         
         currentSelectedUserId = responseData.data.userData.user_id;
@@ -455,7 +452,9 @@ function userChatResponse(responseData) {
             $(".lw-messenger-chat-window").scrollTop(1000000);
             var messageRequestStatus = responseData.data.userData.messageRequestStatus;
             handleMessageActionContainer(messageRequestStatus, true);
-            __Messenger.hideShowChatSidebar();
+            if (window.matchMedia('(max-width: 767px)').matches) {
+                $('#lwMessengerRoot').removeClass('lw-messenger-sidebar-opened');
+            }
             __Messenger.loadEmojiContent();
             __Messenger.openStickerBottomSheet();
             __Messenger.openGifBottomSheet();
