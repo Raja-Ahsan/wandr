@@ -95,6 +95,11 @@
     'dist/js/lw-ajax-swal.js',
     'dist/js/common-app*.js'
 ], true) ?>
+@if(isLoggedIn())
+<?= __yesset([
+    'dist/js/find-matches-swipe.js'
+], true) ?>
+@endif
 <script>
     __Utils.setTranslation({
         'processing': "<?= __tr('processing') ?>",

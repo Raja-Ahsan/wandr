@@ -998,6 +998,38 @@ return [
                 'default' => 0,
             ],
         ],
+        'super-like' => [
+            'enable_super_like' => [
+                'key' => 'enable_super_like',
+                'data_type' => 3,    // int / bool
+                'placeholder' => '',
+                'default' => 1,
+            ],
+            'super_like_price' => [
+                'key' => 'super_like_price',
+                'data_type' => 3,    // int
+                'placeholder' => '',
+                'default' => 10,
+            ],
+            'super_like_price_premium' => [
+                'key' => 'super_like_price_premium',
+                'data_type' => 3,    // int
+                'placeholder' => '',
+                'default' => 5,
+            ],
+            'super_like_daily_free' => [
+                'key' => 'super_like_daily_free',
+                'data_type' => 3,    // int
+                'placeholder' => '',
+                'default' => 1,
+            ],
+            'super_like_daily_free_premium' => [
+                'key' => 'super_like_daily_free_premium',
+                'data_type' => 3,    // int
+                'placeholder' => '',
+                'default' => 5,
+            ],
+        ],
         'random_user' => [
             'booster_user_count' => [
                 'key' => 'booster_user_count',

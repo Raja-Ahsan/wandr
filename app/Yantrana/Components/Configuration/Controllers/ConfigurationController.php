@@ -38,6 +38,11 @@ class ConfigurationController extends BaseController
      *---------------------------------------------------------------- */
     public function getConfiguration($pageType)
     {
+        // Temporarily blocked admin pages
+        if (in_array($pageType, ['licence-information', 'mobile-app'], true)) {
+            abort(404);
+        }
+
         $processReaction = $this->configurationEngine->prepareConfigurations($pageType);
 
         return $this->loadManageView('configuration.settings', $processReaction['data']);
@@ -144,7 +149,7 @@ class ConfigurationController extends BaseController
      *---------------------------------------------------------------- */
     public function registerProductView()
     {
-        return $this->loadManageView('configuration.licence-information');
+        abort(404); // Temporarily hidden
     }
 
     /**
@@ -155,9 +160,7 @@ class ConfigurationController extends BaseController
      *---------------------------------------------------------------- */
     public function processProductRegistration(ConfigurationRequest $request)
     {
-        $processReaction = $this->configurationEngine->processProductRegistration($request->all());
-
-        return $this->responseAction($this->processResponse($processReaction, [], [], true));
+        abort(404); // Temporarily hidden
     }
 
     /**
@@ -168,9 +171,7 @@ class ConfigurationController extends BaseController
      *---------------------------------------------------------------- */
     public function processProductRegistrationRemoval(ConfigurationRequest $request)
     {
-        $processReaction = $this->configurationEngine->processProductRegistrationRemoval();
-
-        return $this->responseAction($this->processResponse($processReaction, [], [], true));
+        abort(404); // Temporarily hidden
     }
 
     /**
@@ -180,9 +181,7 @@ class ConfigurationController extends BaseController
      */
     public function mobileAppConfigurations()
     {
-        return $this->loadManageView('configuration.mobile-app', $this->configurationEngine->mobileAppData(), [
-            'compress_page' => false
-        ]);
+        abort(404); // Temporarily hidden
     }
 
     /**
@@ -192,6 +191,6 @@ class ConfigurationController extends BaseController
      */
     public function emailTemplateView()
     {
-        return $this->loadManageView('help.email-templates');
+        abort(404); // Temporarily hidden
     }
 }

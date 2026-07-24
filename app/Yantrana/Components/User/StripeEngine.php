@@ -51,11 +51,11 @@ class StripeEngine extends BaseEngine
     public function processStripeRequest($request)
     {
       
-        $successUrl = route('user.credit_wallet.write.stripe.callback_url').'?session_id={CHECKOUT_SESSION_ID}'.'&packageUid='.$request['packageUid'];
-        $cancelUrl = route('user.credit_wallet.write.stripe.cancel_url').'?&packageUid='.$request['packageUid'];
+        $successUrl = route('user.credit_wallet.write.stripe.callback_url').'?session_id={CHECKOUT_SESSION_ID}'.'&packageUid='.$request['packageUid'].'&packageType='.urlencode($request['packageType'] ?? 'credit');
+        $cancelUrl = route('user.credit_wallet.write.stripe.cancel_url').'?&packageUid='.$request['packageUid'].'&packageType='.urlencode($request['packageType'] ?? 'credit');
 
         try {
-            $session = \Stripe\Checkout\Session::create([
+            $sessionPayload = [
                 'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
@@ -64,24 +64,35 @@ class StripeEngine extends BaseEngine
                         'product_data' => [
                           'name' => $request['package_name'],
                           'description' => $request['package_name'] . ' @ ' . getStoreSettings('name'),
-                          'images' => [
-                            $request['packageImageUrl']
-                        ],
+                          'images' => array_values(array_filter([
+                            $request['packageImageUrl'] ?? null
+                        ])),
                         ],
                     ],
                     'quantity' => 1,
                 ]],
-                'payment_intent_data' => [
-                    //packageUid storing
-                    "metadata" => [
-                        'packageUid' => $request['packageUid'],
-                        'userId'=> $request['userId'],
-                    ],
+                'metadata' => [
+                    'packageUid' => $request['packageUid'],
+                    'packageType' => $request['packageType'] ?? 'credit',
+                    'userId' => $request['userId'],
                 ],
                 'mode' => 'payment',
                 'success_url' => $successUrl,
                 'cancel_url' => $cancelUrl,
-            ]);
+            ];
+
+            // $0 checkouts do not create a PaymentIntent; skip payment_intent_data for them.
+            if ((float) $request['amount'] > 0) {
+                $sessionPayload['payment_intent_data'] = [
+                    'metadata' => [
+                        'packageUid' => $request['packageUid'],
+                        'packageType' => $request['packageType'] ?? 'credit',
+                        'userId' => $request['userId'],
+                    ],
+                ];
+            }
+
+            $session = \Stripe\Checkout\Session::create($sessionPayload);
 
             //success response with session data
             return $this->engineReaction(1, $session);
@@ -111,28 +122,51 @@ class StripeEngine extends BaseEngine
                 return $this->engineReaction(2, null, __tr('Session data does not exist.'));
             }
 
+            $paymentIntentId = $sessionData->payment_intent ?? null;
+            $sessionStatus = $sessionData->status ?? null;
+            $paymentStatus = $sessionData->payment_status ?? null;
+
+            // Free / $0 checkouts complete without a PaymentIntent.
+            if (__isEmpty($paymentIntentId)) {
+                if ($sessionStatus === 'complete' && in_array($paymentStatus, ['paid', 'no_payment_required'], true)) {
+                    $metadata = [];
+                    if (! empty($sessionData->metadata)) {
+                        $metadata = json_decode(json_encode($sessionData->metadata), true) ?: [];
+                    }
+                    if (empty($metadata['userId'])) {
+                        $metadata['userId'] = getUserId();
+                    }
+                    if (empty($metadata['packageUid']) && request()->filled('packageUid')) {
+                        $metadata['packageUid'] = request('packageUid');
+                    }
+
+                    return $this->engineReaction(1, [
+                        'paymentData' => [
+                            'id' => $sessionData->id,
+                            'amount' => (int) ($sessionData->amount_total ?? 0),
+                            'status' => 'succeeded',
+                            'currency' => $sessionData->currency ?? getStoreSettings('currency'),
+                            'metadata' => $metadata,
+                        ],
+                    ], __tr('Success'));
+                }
+
+                return $this->engineReaction(2, [
+                    'errorMessage' => __tr('Payment intent missing for this Stripe session.'),
+                ], __tr('Failed Payment'));
+            }
+
             //fetch payment intent data
-            $paymentIntentData = \Stripe\PaymentIntent::retrieve($sessionData->payment_intent);
+            $paymentIntentData = \Stripe\PaymentIntent::retrieve($paymentIntentId);
 
             //Success response with message
             return $this->engineReaction(1, [
                 'paymentData' => json_decode(json_encode($paymentIntentData), true),
             ], __tr('Success'));
-        } catch (\Stripe\Error\InvalidRequest $err) {
-            //set error message if payment failed
-            $errorMessage['errorMessage'] = $err->getMessage();
-
+        } catch (\Throwable $err) {
             //failure response with message
             return $this->engineReaction(2, [
-                'errorMessage' => (array) $errorMessage,
-            ], __tr('Failed Payment'));
-        } catch (\Stripe\Error\Card $err) {
-            //set error message if payment failed
-            $errorMessage['errorMessage'] = $err->getMessage();
-
-            //failure response with message
-            return $this->engineReaction(2, [
-                'errorMessage' => (array) $errorMessage,
+                'errorMessage' => $err->getMessage(),
             ], __tr('Failed Payment'));
         }
     }

@@ -148,10 +148,19 @@
                             </span>
                             <!-- /dislike button -->
                         </div>
-                        <div class="">
-                            <!-- message button -->
-                            <a title="{{ __tr('Send Message or Gift') }}" class=" btn-link btn mb-3" onclick="getChatMessenger('<?= route('user.read.individual_conversation', ['specificUserId' => $userData['userId']]) ?>')" href id="lwMessageChatButton" data-chat-loaded="false" data-toggle="modal" data-target="#messengerDialog"><i class="far fa-comments fa-3x"></i>
+                        <div class="" id="lwProfileChatAction">
+                            @if(!empty($canChatWithUser))
+                            <!-- message button (unlocked — mutual match) -->
+                            <a title="{{ __tr('Send Message or Gift') }}" class="btn-link btn mb-3 lw-chat-unlocked-btn" onclick="getChatMessenger('<?= route('user.read.individual_conversation', ['specificUserId' => $userData['userId']]) ?>')" href id="lwMessageChatButton" data-chat-loaded="false" data-toggle="modal" data-target="#messengerDialog"><i class="far fa-comments fa-3x"></i>
                                 <br> <?= __tr('Message') ?></a>
+                            @else
+                            <!-- message button locked until mutual match -->
+                            <a title="<?= __tr('Match required to chat') ?>" class="btn-link btn mb-3 lw-chat-locked-btn text-muted" href="javascript:void(0);" onclick="return false;" id="lwMessageChatButtonLocked">
+                                <i class="fas fa-lock fa-3x"></i>
+                                <br> <?= __tr('Message') ?>
+                                <small class="d-block mt-1"><?= __tr('Match to unlock') ?></small>
+                            </a>
+                            @endif
                             <!-- send gift button -->
                             <a href title="<?= __tr('Send Gift') ?>" data-toggle="modal" data-target="#lwSendGiftDialog" class="btn-link btn"><i class="fa fa-gift fa-3x" aria-hidden="true"></i>
                                 <br> <?= __tr('Gift') ?>
@@ -242,10 +251,19 @@
 			<div class="card-header">
 				<?= __tr('Send Message or Gift') ?>
 			</div>
-			<div class="card-body text-center">
-				<!-- message button -->
-				<a class="mr-3 btn-link btn" onclick="getChatMessenger('<?= route('user.read.individual_conversation', ['specificUserId' => $userData['userId']]) ?>')" href id="lwMessageChatButton" data-chat-loaded="false" data-toggle="modal" data-target="#messengerDialog"><i class="far fa-comments fa-3x"></i>
+			<div class="card-body text-center" id="lwProfileChatActionMobile">
+				@if(!empty($canChatWithUser))
+				<!-- message button (unlocked — mutual match) -->
+				<a class="mr-3 btn-link btn lw-chat-unlocked-btn" onclick="getChatMessenger('<?= route('user.read.individual_conversation', ['specificUserId' => $userData['userId']]) ?>')" href id="lwMessageChatButtonMobile" data-chat-loaded="false" data-toggle="modal" data-target="#messengerDialog"><i class="far fa-comments fa-3x"></i>
 					<br> <?= __tr('Message') ?></a>
+				@else
+				<!-- message button locked until mutual match -->
+				<a class="mr-3 btn-link btn lw-chat-locked-btn text-muted" title="<?= __tr('Match required to chat') ?>" href="javascript:void(0);" onclick="return false;" id="lwMessageChatButtonLockedMobile">
+					<i class="fas fa-lock fa-3x"></i>
+					<br> <?= __tr('Message') ?>
+					<small class="d-block mt-1"><?= __tr('Match to unlock') ?></small>
+				</a>
+				@endif
 
 				<!-- send gift button -->
 				<a href title="<?= __tr('Send Gift') ?>" data-toggle="modal" data-target="#lwSendGiftDialog" class="btn-link btn"><i class="fa fa-gift fa-3x" aria-hidden="true"></i>
@@ -924,6 +942,28 @@
 		_.delay(function() {
 			$('.lw-like-dislike-box').removeClass("lw-disable-anchor-tag");
 		}, 1000);
+
+		// Unlock chat instantly when this like creates a mutual match
+		if (response.reaction == 1 && requestData && requestData.isMutualMatch) {
+			unlockProfileChatButtons();
+		} else if (response.reaction == 1 && requestData && requestData.isMutualMatch === false && (requestData.likeStatus == 2 || requestData.status == 'deleted')) {
+			lockProfileChatButtons();
+		}
+	}
+
+	function unlockProfileChatButtons() {
+		var chatUrl = "<?= route('user.read.individual_conversation', ['specificUserId' => $userData['userId']]) ?>";
+		var unlockedHtml = '<a title="<?= __tr('Send Message or Gift') ?>" class="btn-link btn mb-3 lw-chat-unlocked-btn" onclick="getChatMessenger(\'' + chatUrl + '\')" href id="lwMessageChatButton" data-chat-loaded="false" data-toggle="modal" data-target="#messengerDialog"><i class="far fa-comments fa-3x"></i><br> <?= __tr('Message') ?></a>';
+		var unlockedMobileHtml = '<a class="mr-3 btn-link btn lw-chat-unlocked-btn" onclick="getChatMessenger(\'' + chatUrl + '\')" href id="lwMessageChatButtonMobile" data-chat-loaded="false" data-toggle="modal" data-target="#messengerDialog"><i class="far fa-comments fa-3x"></i><br> <?= __tr('Message') ?></a>';
+		$('#lwProfileChatAction .lw-chat-locked-btn, #lwProfileChatAction .lw-chat-unlocked-btn').first().replaceWith(unlockedHtml);
+		$('#lwProfileChatActionMobile .lw-chat-locked-btn, #lwProfileChatActionMobile .lw-chat-unlocked-btn').first().replaceWith(unlockedMobileHtml);
+	}
+
+	function lockProfileChatButtons() {
+		var lockedHtml = '<a title="<?= __tr('Match required to chat') ?>" class="btn-link btn mb-3 lw-chat-locked-btn text-muted" href="javascript:void(0);" onclick="return false;" id="lwMessageChatButtonLocked"><i class="fas fa-lock fa-3x"></i><br> <?= __tr('Message') ?><small class="d-block mt-1"><?= __tr('Match to unlock') ?></small></a>';
+		var lockedMobileHtml = '<a class="mr-3 btn-link btn lw-chat-locked-btn text-muted" title="<?= __tr('Match required to chat') ?>" href="javascript:void(0);" onclick="return false;" id="lwMessageChatButtonLockedMobile"><i class="fas fa-lock fa-3x"></i><br> <?= __tr('Message') ?><small class="d-block mt-1"><?= __tr('Match to unlock') ?></small></a>';
+		$('#lwProfileChatAction .lw-chat-unlocked-btn, #lwProfileChatAction .lw-chat-locked-btn').first().replaceWith(lockedHtml);
+		$('#lwProfileChatActionMobile .lw-chat-unlocked-btn, #lwProfileChatActionMobile .lw-chat-locked-btn').first().replaceWith(lockedMobileHtml);
 	}
 	/**************** User Like Dislike Fetch and Callback Block End ******************/
 

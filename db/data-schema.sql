@@ -140,6 +140,45 @@ CREATE TABLE `credit_packages` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `super_like_packages`
+--
+
+CREATE TABLE `super_like_packages` (
+  `_id` int(10) UNSIGNED NOT NULL,
+  `_uid` char(36) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `title` varchar(150) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `total_likes` int(10) UNSIGNED NOT NULL,
+  `price` decimal(13,4) NOT NULL DEFAULT 0.0000,
+  `credit_price` int(10) UNSIGNED DEFAULT 0,
+  `users__id` int(10) UNSIGNED DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `super_like_wallet_transactions`
+--
+
+CREATE TABLE `super_like_wallet_transactions` (
+  `_id` int(10) UNSIGNED NOT NULL,
+  `_uid` char(36) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `users__id` int(10) UNSIGNED NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `super_like_packages__id` int(10) UNSIGNED DEFAULT NULL,
+  `credit_wallet_transactions__id` int(10) UNSIGNED DEFAULT NULL,
+  `description` varchar(150) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `credit_wallet_transactions`
 --
 

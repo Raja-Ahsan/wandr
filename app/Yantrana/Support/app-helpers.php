@@ -938,6 +938,40 @@ if (! function_exists('totalUserCredits')) {
     }
 }
 
+/**
+ * Super Like balance / shop info (package-based)
+ *
+ * @param  int|null  $userId
+ * @return array
+ */
+if (! function_exists('getSuperLikeQuotaInfo')) {
+    function getSuperLikeQuotaInfo($userId = null)
+    {
+        if (__isEmpty($userId)) {
+            $userId = getUserID();
+        }
+
+        $enabled = (int) getStoreSettings('enable_super_like') === 1;
+        $balance = (int) \App\Yantrana\Components\SuperLikePackage\Models\SuperLikeWalletTransactionModel::where('users__id', $userId)
+            ->sum('quantity');
+
+        $creditsBalance = (int) CreditWalletTransaction::where('users__id', $userId)->sum('credits');
+
+        return [
+            'enabled' => $enabled,
+            'balance' => max(0, $balance),
+            'can_super_like' => $enabled && $balance > 0,
+            'credits_balance' => $creditsBalance,
+            'shop_url' => route('user.credit_wallet.read.view'),
+            // Legacy keys kept for older UI snippets
+            'free_remaining' => max(0, $balance),
+            'credits_required' => 0,
+            'next_is_free' => $balance > 0,
+            'can_afford' => $balance > 0,
+        ];
+    }
+}
+
 if (! function_exists('isPremiumUser')) {
     /**
      * Check loggedIn user is Premium User
@@ -1093,6 +1127,10 @@ if (! function_exists('formatNotificationMessage')) {
                 return __tr('Profile liked by __fullName__', [
                    '__fullName__' => $fullName
                 ]); //
+            }elseif($notify->type == 6){// type 6 for super like
+                return __tr('Super Liked by __fullName__', [
+                   '__fullName__' => $fullName
+                ]);
             }elseif($notify->type == 3){// type 3 for new msg request
                 return __tr('Message request received from __fullName__', [
                    '__fullName__' => $fullName
@@ -1522,5 +1560,25 @@ if (! function_exists('getUsersAllConversationCount')) {
            ]);
        }
         return $filteredNewMsgCount;
+    }
+}
+
+/**
+ * Check if two users have a mutual like (both liked each other).
+ *
+ * @param  int  $userId
+ * @param  int  $otherUserId
+ * @return bool
+ *-----------------------------------------------------------------------*/
+if (! function_exists('usersHaveMutualLike')) {
+    function usersHaveMutualLike($userId, $otherUserId)
+    {
+        if (__isEmpty($userId) || __isEmpty($otherUserId)) {
+            return false;
+        }
+
+        $userRepository = app(\App\Yantrana\Components\User\Repositories\UserRepository::class);
+
+        return $userRepository->isMutualLike($userId, $otherUserId);
     }
 }

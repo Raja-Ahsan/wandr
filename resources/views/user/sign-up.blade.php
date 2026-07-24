@@ -15,8 +15,7 @@
 
 <body class="lw-login-register-page">
     <img class="lw-logo-img-on-bg" src="<?= getStoreSettings('logo_image_url') ?>" alt="<?= getStoreSettings('name') ?>">
-    <div class="lw-page-bg lw-lazy-img" data-src="<?= __yesset(" imgs/home/random/*.jpg", false, [ 'random'=> true
-        ]) ?>"></div>
+    <div class="lw-page-bg lw-lazy-img" data-src="<?= asset('imgs/dating-banner.png') ?>"></div>
     <!-- container start -->
     <div class="container">
         <div class="row justify-content-center">

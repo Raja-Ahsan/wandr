@@ -8,12 +8,14 @@
 @section('twitter-card-image', getStoreSettings('logo_image_url'))
 @section('page-url', url()->current())
 
+<div class="lw-discover-page">
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h5 class="h5 mb-0 text-gray-200">
-        <span class="text-primary"><i class="fas fa-search" aria-hidden="true"></i></span>
-        <?= __tr('Find Matches') ?>
-    </h5>
+<div class="lw-discover-hero mb-4">
+    <div class="lw-discover-hero-copy">
+        <p class="lw-discover-eyebrow"><?= __tr('Wandr') ?></p>
+        <h1 class="lw-discover-title"><?= __tr('Discover') ?></h1>
+        <p class="lw-discover-subtitle"><?= __tr('Swipe through people who match your vibe') ?></p>
+    </div>
 </div>
 
 <?php
@@ -21,6 +23,8 @@ $lookingFor = getUserSettings('looking_for');
 $minAge = getUserSettings('min_age');
 $maxAge = getUserSettings('max_age');
 $request = request();
+$defaultMinAge = configItem('user_settings.default_min_age') ?: 18;
+$defaultMaxAge = configItem('user_settings.default_max_age') ?: 70;
 
 if ($request->session()->has('userSearchData')) {
     $userSearchData = session('userSearchData');
@@ -37,13 +41,40 @@ if ($request->session()->has('userSearchData')) {
     looking_for:'<?= (!__isEmpty($request->looking_for)) ? $request->looking_for : getUserSettings('looking_for') ?>',
     min_age:'<?= (!__isEmpty($request->min_age)) ? $request->min_age : getUserSettings('min_age') ?>',
     max_age:'<?= (!__isEmpty($request->max_age)) ? $request->max_age : getUserSettings('max_age') ?>',
-    user_type:['<?= (!__isEmpty($request->user_type)) ? $request->user_type : getUserSettings('user_type') ?>']
+    user_type:['<?= (!__isEmpty($request->user_type)) ? $request->user_type : getUserSettings('user_type') ?>'],
+    clearFilter() {
+        this.name = '';
+        this.username = '';
+        this.looking_for = 'all';
+        this.min_age = '<?= (int) $defaultMinAge ?>';
+        this.max_age = '<?= (int) $defaultMaxAge ?>';
+        this.distance = '';
+        this.user_type = [];
+        document.querySelectorAll('.lw-advance-filter-container input[type=checkbox]').forEach(function (el) {
+            el.checked = false;
+        });
+        this.$nextTick(() => {
+            var form = document.querySelector('.lw-find-form-container form.lw-ajax-form');
+            if (form) {
+                var submitBtn = form.querySelector('button[type=submit]');
+                if (submitBtn) {
+                    submitBtn.click();
+                } else {
+                    form.submit();
+                }
+            }
+        });
+    }
 }">
 {{-- <?= ($request->user_type == '1') ? 'checked' : '' ?> --}}
     <!-- Page Heading -->
-<div class="card lw-find-form-container mb-4 ">
+<div class="card lw-find-form-container lw-discover-filters mb-4 ">
     <div class="card-body">
+        <div class="lw-discover-filters-head">
+            <span class="lw-discover-filters-title"><i class="fas fa-sliders-h"></i> <?= __tr('Preferences') ?></span>
+        </div>
         <form class="form-inline mr-auto form-group text-left lw-ajax-form lw-action-with-url" method="get" data-show-processing="true" action="<?= route('user.read.find_matches') ?>">
+            <input type="hidden" name="filter_results_only" value="1">
             <!-- Add Name -->
             <div class="lw-distance-location-container lw-basic-filter-field">
                 <label for="name"><?= __tr('Name') ?></label>
@@ -104,8 +135,11 @@ if ($request->session()->has('userSearchData')) {
                 </div>
             </div>
             <!-- /User Type -->
-            <div class="lw-basic-filter-footer-container lw-basic-filter-field">
+            <div class="lw-basic-filter-footer-container lw-basic-filter-field lw-discover-filter-actions">
                 <button type="submit" class="btn btn-primary btn-block-on-mobile"><?= __tr('Search') ?></button>
+                <button type="button" @click="clearFilter()" class="btn btn-outline-secondary btn-block-on-mobile" title="<?= __tr('Clear Filter') ?>">
+                    <i class="fas fa-undo"></i> <?= __tr('Clear') ?>
+                </button>
                 <button type="button" x-show="!showAdvanceFilter" @click="showAdvanceFilter = !showAdvanceFilter" class="btn btn-secondary btn-block-on-mobile" style="<?= !__isEmpty($request->is_advance_filter) ? 'display: none;' : '' ?>" id="lwShowAdvanceFilterLink"><i class="fas fa-filter"></i> <?= __tr('Show Advanced Filter') ?></button>
                 <button type="button" x-show="showAdvanceFilter" @click="showAdvanceFilter = !showAdvanceFilter" class="btn btn-secondary btn-block-on-mobile" style="<?= __isEmpty($request->is_advance_filter) ? 'display: none;' : '' ?>" id="lwHideAdvanceFilterLink"><i class="fas fa-filter"></i> <?= __tr('Hide Advanced Filter') ?></button>
             </div>
@@ -144,6 +178,7 @@ if ($request->session()->has('userSearchData')) {
         <form class="lw-ajax-form lw-action-with-url" data-show-processing="true" action="<?= route('user.read.find_matches') ?>" method="get">
             <div class="tab-content" id="lwAdvanceFilterTabContent">
                 <input type="hidden" name="is_advance_filter" value="yes">
+                <input type="hidden" name="filter_results_only" value="1">
                 <!-- Hidden field of basic filter -->
                 <input type="hidden" name="name"  x-model="name">
                 <input type="hidden" name="username" x-model="username">
@@ -283,3 +318,4 @@ if ($request->session()->has('userSearchData')) {
 <div id="lwFindMatchesContainer">
     @include('filter.find-matches-container')
 </div>
+</div><!-- /.lw-discover-page -->

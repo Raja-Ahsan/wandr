@@ -1,6 +1,8 @@
 @if(!__isEmpty($filterData))
 @foreach($filterData as $filter)
-<div class="col mb-4">
+<div class="col mb-4 lw-browse-user-col"
+	data-uid="<?= e($filter['_uid'] ?? '') ?>"
+	data-username="<?= e($filter['username'] ?? '') ?>">
 	<div class="card text-center lw-user-thumbnail-block <?= (isset($filter['isPremiumUser']) and $filter['isPremiumUser'] == true) ? 'lw-has-premium-badge' : '' ?>">
 		<!-- show user online, idle or offline status -->
 		@if($filter['userOnlineStatus'])
@@ -34,7 +36,7 @@
 @endforeach
 @else
 <!-- info message -->
-<div class="col-sm-12 alert alert-info">
+<div class="col-sm-12 alert alert-info lw-browse-empty-msg">
 	<?= __tr('There are no matches found.') ?>
 </div>
 <!-- / info message -->

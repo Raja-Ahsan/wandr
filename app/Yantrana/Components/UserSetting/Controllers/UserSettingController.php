@@ -216,6 +216,20 @@ class UserSettingController extends BaseController
     }
 
     /**
+     * Get cities for a selected country (wizard location step).
+     *
+     * @return json object
+     *---------------------------------------------------------------- */
+    public function getCitiesByCountry(CommonUnsecuredPostRequest $request)
+    {
+        $processReaction = $this->userSettingEngine->getCitiesByCountry($request->get('country_id'));
+
+        return $this->responseAction(
+            $this->processResponse($processReaction, [], [], true)
+        );
+    }
+
+    /**
      * Process store user city
      *
      * @return json object

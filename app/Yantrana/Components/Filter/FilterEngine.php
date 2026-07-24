@@ -238,6 +238,7 @@ class FilterEngine extends BaseEngine implements FilterEngineInterface
             'hasMorePages' => $filterDataCollection->hasMorePages(),
             'totalCount' => $filterDataCollection->total(),
             'basicFilterData' => $basicFilterData,
+            'superLikeQuota' => getSuperLikeQuotaInfo(),
         ]);
     }
 
@@ -348,6 +349,7 @@ class FilterEngine extends BaseEngine implements FilterEngineInterface
                 // Prepare data for filter
                 $filterData[] = [
                     'id' => $filter->user_id,
+                    '_uid' => $filter->user_uid,
                     'username' => $filter->username,
                     'fullName' => $filter->first_name.' '.$filter->last_name,
                     'profileImage' => $profilePictureUrl,
@@ -404,6 +406,7 @@ class FilterEngine extends BaseEngine implements FilterEngineInterface
             'nextPageUrl' => $fullUrl.'&page='.$currentPage,
             'hasMorePages' => $filterDataCollection->hasMorePages(),
             'totalCount' => $filterDataCollection->total(),
+            'superLikeQuota' => getSuperLikeQuotaInfo(),
         ]);
     }
 

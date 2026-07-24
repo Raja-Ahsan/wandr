@@ -90,6 +90,7 @@ class Authenticate
                         'user.logout',
                         'user.get_profile_data',
                         'user.read.search_static_cities',
+                        'user.read.cities_by_country',
                         'user.write.store_city',
                         'user.write.wizard_country_city',
                         'user.write.wizard_coordinates',

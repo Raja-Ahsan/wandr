@@ -13,6 +13,7 @@ use App\Yantrana\Components\UserSetting\Interfaces\UserSettingEngineInterface;
 use App\Yantrana\Components\UserSetting\Repositories\UserSettingRepository;
 use App\Yantrana\Support\CommonTrait;
 use App\Yantrana\Support\Country\Repositories\CountryRepository;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -807,6 +808,134 @@ class UserSettingEngine extends BaseEngine implements UserSettingEngineInterface
     }
 
     /**
+     * Fetch cities for a country (local DB first, then remote fallback).
+     *
+     * @param  int|string  $countryId
+     * @return array
+     *---------------------------------------------------------------- */
+    public function getCitiesByCountry($countryId)
+    {
+        if (__isEmpty($countryId)) {
+            return $this->engineReaction(2, null, __tr('Please select a country.'));
+        }
+
+        $countryDetails = $this->countryRepository->fetchById($countryId);
+
+        if (__isEmpty($countryDetails)) {
+            return $this->engineReaction(18, null, __tr('Country not found'));
+        }
+
+        $dbCities = $this->userSettingRepository->fetchCityNamesByCountryCode($countryDetails->iso_code);
+
+        if (! __isEmpty($dbCities)) {
+            return $this->engineReaction(1, [
+                'show_message' => false,
+                'cities' => $dbCities,
+            ], __tr('Cities loaded'));
+        }
+
+        $cacheKey = 'wizard_cities_country_'.strtolower((string) ($countryDetails->iso_code ?: $countryDetails->_id));
+
+        $remoteCities = Cache::remember($cacheKey, now()->addDays(7), function () use ($countryDetails) {
+            return $this->fetchRemoteCitiesByCountryName($countryDetails->name);
+        });
+
+        if (__isEmpty($remoteCities)) {
+            Cache::forget($cacheKey);
+
+            return $this->engineReaction(2, [
+                'show_message' => true,
+                'cities' => [],
+            ], __tr('No cities found for this country.'));
+        }
+
+        return $this->engineReaction(1, [
+            'show_message' => false,
+            'cities' => $remoteCities,
+        ], __tr('Cities loaded'));
+    }
+
+    /**
+     * Fetch city list from CountriesNow (no API key).
+     *
+     * @param  string  $countryName
+     * @return array
+     *---------------------------------------------------------------- */
+    protected function fetchRemoteCitiesByCountryName($countryName)
+    {
+        $countryName = trim((string) $countryName);
+
+        if ($countryName === '') {
+            return [];
+        }
+
+        $nameAliases = [
+            'United States' => ['United States', 'United States of America', 'USA'],
+            'United Kingdom' => ['United Kingdom', 'United Kingdom of Great Britain and Northern Ireland', 'UK'],
+            'Russia' => ['Russia', 'Russian Federation'],
+            'South Korea' => ['South Korea', 'Korea, Republic of', 'Korea South'],
+            'North Korea' => ['North Korea', 'Korea, Democratic People\'s Republic of', 'Korea North'],
+            'Vietnam' => ['Vietnam', 'Viet Nam'],
+            'Iran' => ['Iran', 'Iran, Islamic Republic of'],
+            'Syria' => ['Syria', 'Syrian Arab Republic'],
+            'Tanzania' => ['Tanzania', 'Tanzania, United Republic of'],
+            'Bolivia' => ['Bolivia', 'Bolivia, Plurinational State of'],
+            'Venezuela' => ['Venezuela', 'Venezuela, Bolivarian Republic of'],
+            'Czech Republic' => ['Czech Republic', 'Czechia'],
+            'Ivory Coast' => ['Ivory Coast', 'Cote D\'Ivoire', "Côte d'Ivoire"],
+        ];
+
+        $namesToTry = [$countryName];
+
+        foreach ($nameAliases as $aliases) {
+            if (in_array($countryName, $aliases, true)) {
+                $namesToTry = array_values(array_unique(array_merge($namesToTry, $aliases)));
+                break;
+            }
+        }
+
+        foreach ($namesToTry as $tryName) {
+            try {
+                $response = Http::timeout(20)->asJson()->post('https://countriesnow.space/api/v0.1/countries/cities', [
+                    'country' => $tryName,
+                ]);
+
+                if (! $response->successful()) {
+                    continue;
+                }
+
+                $payload = $response->json();
+
+                if (! empty($payload['error']) or empty($payload['data']) or ! is_array($payload['data'])) {
+                    continue;
+                }
+
+                $cities = collect($payload['data'])
+                    ->filter(function ($city) {
+                        return is_string($city) and trim($city) !== '';
+                    })
+                    ->map(function ($city) {
+                        return trim($city);
+                    })
+                    ->unique()
+                    ->sort(function ($a, $b) {
+                        return strcasecmp($a, $b);
+                    })
+                    ->values()
+                    ->toArray();
+
+                if (! __isEmpty($cities)) {
+                    return $cities;
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * Process Store Location City
      *
      * @param  array  $inputData
@@ -885,7 +1014,7 @@ class UserSettingEngine extends BaseEngine implements UserSettingEngineInterface
         $cityName = trim($inputData['city'] ?? '');
 
         if (__isEmpty($countryId) or $cityName === '') {
-            return $this->engineReaction(2, null, __tr('Please select a country and enter your city.'));
+            return $this->engineReaction(2, null, __tr('Please select a country and city.'));
         }
 
         $countryDetails = $this->countryRepository->fetchById($countryId);

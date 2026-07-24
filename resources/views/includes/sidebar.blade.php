@@ -53,6 +53,12 @@ $currentRouteName = Route::getCurrentRoute()->getName();
                 <span><?= __tr('Credit Packages') ?></span>
             </a>
         </li>
+        <li class="nav-item <?= makeLinkActive('manage.super_like_package.read.list', $currentRouteName) ?>">
+            <a class="nav-link lw-ajax-link-action lw-action-with-url" href="<?= route('manage.super_like_package.read.list') ?>">
+                <i class="fa-solid fa-star"></i>
+                <span><?= __tr('Super Like Packages') ?></span>
+            </a>
+        </li>
         <li class="nav-item <?= makeLinkActive('manage.abuse_report.read.list', $currentRouteName) ?>">
             <a class="nav-link lw-ajax-link-action lw-action-with-url" href="<?= route('manage.abuse_report.read.list', ['status' => 1]) ?>">
                 <i class="fa-solid fa-flag"></i>
@@ -143,6 +149,12 @@ $currentRouteName = Route::getCurrentRoute()->getName();
                         <span><?= __tr('Email & SMS') ?></span>
                     </a>
                     <!-- /Email Settings -->
+                    <!-- Super Like Settings -->
+                    <a class="nav-link lw-ajax-link-action lw-action-with-url {{ $pageType == 'super-like' ? 'active' : ''}}" href="<?= route('manage.configuration.read', ['pageType' => 'super-like']) ?>">
+                        <i class="fa-solid fa-star"></i>
+                        <span><?= __tr('Super Like') ?></span>
+                    </a>
+                    <!-- /Super Like Settings -->
                     <!-- Booster Settings -->
                     <a class="nav-link lw-ajax-link-action lw-action-with-url {{ $pageType == 'booster' ? 'active' : ''}}" href="<?= route('manage.configuration.read', ['pageType' => 'booster']) ?>">
                         <i class="fa-solid fa-rocket"></i>
@@ -182,24 +194,29 @@ $currentRouteName = Route::getCurrentRoute()->getName();
                 <span><?= __tr('Generate Fake Users') ?></span>
             </a>
         </li>
+        {{-- Temporarily hidden: Fake User Messenger
         <li class="nav-item <?= makeLinkActive('manage.fake_users.read.messenger', $currentRouteName) ?>">
-            <a class="nav-link lw-ajax-link-action lw-action-with-url" href="<?= route('manage.fake_users.read.messenger') ?>" onclick="getChatMessenger('<?= route('user.read.all_conversation') ?>', true)">
+            <a class="nav-link lw-ajax-link-action lw-action-with-url" href="<?= route('manage.fake_users.read.messenger') ?>">
                 <i class="fa-solid fa-comments"></i>
                 <span><?= __tr('Fake User Messenger') ?></span>
             </a>
         </li>
+        --}}
+        {{-- Temporarily hidden: Help References - Emails
         <li class="nav-item <?= makeLinkActive('manage.help.read', $currentRouteName) ?>">
             <a class="nav-link lw-ajax-link-action lw-action-with-url" href="<?= route('manage.help.read') ?>">
                 <i class="fa-solid fa-circle-question"></i>
                 <span><?= __tr('Help References - Emails') ?></span>
             </a>
         </li>
+        --}}
         <li class="nav-item">
             <a class="nav-link" title="<?= __tr("If you have made changes which doesn't reflecting this link may help to clear all the cache.") ?>" href="<?= route('manage.configuration.clear_cache', []) . '?redirectTo=' . base64_encode(Request::fullUrl()); ?>">
                 <i class="fa-solid fa-broom"></i>
                 <span><?= __tr('Clear System Cache') ?></span>
             </a>
         </li>
+        {{-- Temporarily hidden: License + Mobile App
         <li class="nav-item <?= Request::fullUrl() == route('manage.configuration.read', ['pageType' => 'licence-information']) ? 'active' : '' ?>">
             <a class="nav-link" href="<?= route('manage.configuration.read', ['pageType' => 'licence-information']) ?>">
                 <i class="fa-solid fa-certificate"></i>
@@ -212,6 +229,7 @@ $currentRouteName = Route::getCurrentRoute()->getName();
                 <span><?= __tr('Mobile App') ?></span>
             </a>
         </li>
+        --}}
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
         <div class="text-center d-none d-md-inline">

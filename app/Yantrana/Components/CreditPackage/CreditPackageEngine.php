@@ -72,7 +72,7 @@ class CreditPackageEngine extends BaseEngine implements CreditPackageEngineInter
                     'created_at' => formatDate($package['created_at']),
                     'updated_at' => formatDate($package['updated_at']),
                     'status' => configItem('status_codes', $package['status']),
-                    'price' => intval($package['price']),
+                    'price' => round((float) $package['price'], 2),
                     'credits' => $package['credits'],
                     'packageImageUrl' => $packageImageUrl,
                 ];
@@ -102,7 +102,7 @@ class CreditPackageEngine extends BaseEngine implements CreditPackageEngineInter
         //store data
         $storeData = [
             'title' => $inputData['title'],
-            'price' => $inputData['price'],
+            'price' => round((float) $inputData['price'], 2),
             'credits' => $inputData['credits'],
             'image' => $inputData['package_image'],
             'status' => (isset($inputData['status'])
@@ -151,7 +151,7 @@ class CreditPackageEngine extends BaseEngine implements CreditPackageEngineInter
                 '_uid' => $packageCollection['_uid'],
                 'title' => $packageCollection['title'],
                 'image' => $packageCollection['image'],
-                'price' => intval($packageCollection['price']),
+                'price' => round((float) $packageCollection['price'], 2),
                 'credits' => $packageCollection['credits'],
                 'status' => $packageCollection['status'],
                 'packageImageUrl' => $packageImageUrl,
@@ -181,7 +181,7 @@ class CreditPackageEngine extends BaseEngine implements CreditPackageEngineInter
         //update data
         $updateData = [
             'title' => $inputData['title'],
-            'price' => $inputData['price'],
+            'price' => round((float) $inputData['price'], 2),
             'credits' => $inputData['credits'],
             'status' => (isset($inputData['status']) and $inputData['status'] == 'on') ? 1 : 2,
         ];

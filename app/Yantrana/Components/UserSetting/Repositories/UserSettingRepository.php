@@ -677,4 +677,25 @@ class UserSettingRepository extends BaseRepository implements UserSettingReposit
     {
         return CityModel::find($cityId);
     }
+
+    /**
+     * Fetch distinct city names for a country ISO code.
+     *
+     * @param  string  $countryCode
+     * @return array
+     *---------------------------------------------------------------- */
+    public function fetchCityNamesByCountryCode($countryCode)
+    {
+        if (__isEmpty($countryCode)) {
+            return [];
+        }
+
+        return CityModel::where('country_code', $countryCode)
+            ->orderBy('name')
+            ->distinct()
+            ->pluck('name')
+            ->filter()
+            ->values()
+            ->toArray();
+    }
 }

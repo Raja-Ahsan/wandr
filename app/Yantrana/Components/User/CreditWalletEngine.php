@@ -23,6 +23,7 @@ use Imdhemy\GooglePlay\Products\ProductPurchase as InAppProductPrice;
 use App\Yantrana\Components\Configuration\Repositories\ConfigurationRepository;
 use App\Yantrana\Components\CreditPackage\Repositories\CreditPackageRepository;
 use App\Yantrana\Components\FinancialTransaction\Repositories\FinancialTransactionRepository;
+use App\Yantrana\Components\SuperLikePackage\Repositories\SuperLikePackageRepository;
 use PushBroadcast;
 
 class CreditWalletEngine extends BaseEngine
@@ -56,6 +57,11 @@ class CreditWalletEngine extends BaseEngine
      * @var  CreditPackageRepository - CreditPackage Repository
      */
     protected $creditPackageRepository;
+
+    /**
+     * @var SuperLikePackageRepository
+     */
+    protected $superLikePackageRepository;
 
     /**
      * @var RazorpayEngine - Razorpay Engine
@@ -124,6 +130,7 @@ class CreditWalletEngine extends BaseEngine
         CryptoEngine $cryptoEngine,
         PaystackEngine $paystackEngine,
         CreditPackageRepository $creditPackageRepository,
+        SuperLikePackageRepository $superLikePackageRepository,
         RazorpayEngine $razorpayEngine,
         CoinGateEngine $coinGateEngine,
         UserRepository $userRepository,
@@ -139,6 +146,7 @@ class CreditWalletEngine extends BaseEngine
         $this->cryptoEngine = $cryptoEngine;
         $this->paystackEngine = $paystackEngine;
         $this->creditPackageRepository = $creditPackageRepository;
+        $this->superLikePackageRepository = $superLikePackageRepository;
         $this->razorpayEngine = $razorpayEngine;
         $this->coinGateEngine = $coinGateEngine;
         $this->userRepository = $userRepository;
@@ -167,9 +175,16 @@ class CreditWalletEngine extends BaseEngine
         $packageCollection = $this->creditPackageRepository->fetchAllActiveCreditPackage();
 
         $creditPackages = [];
+        $userId = getUserID();
         // check if user collection exists
         if (! __isEmpty($packageCollection)) {
             foreach ($packageCollection as $key => $package) {
+                // Industry rule: hide free packages already claimed by this user.
+                if ((float) $package['price'] <= 0
+                    && $this->creditWalletRepository->hasUserClaimedFreePackage($userId, $package['_uid'])) {
+                    continue;
+                }
+
                 $packageImageUrl = '';
                 $packageImageFolderPath = getPathByKey('package_image', ['{_uid}' => $package->_uid]);
                 $packageImageUrl = getMediaUrl($packageImageFolderPath, $package['image']);
@@ -178,17 +193,38 @@ class CreditWalletEngine extends BaseEngine
                     '_uid' => $package['_uid'],
                     'package_uid' => toggleProductId($package['_uid']),
                     'package_name' => $package['title'],
+                    'package_type' => 'credit',
                     'credit' => $package['credits'],
-                    'price' => intval($package['price']),
+                    'price' => round((float) $package['price'], 2),
                     'packageImageUrl' => $packageImageUrl,
                 ];
+            }
+        }
+
+        $superLikePackages = [];
+        if ((int) getStoreSettings('enable_super_like') === 1) {
+            $superLikeCollection = $this->superLikePackageRepository->fetchAllActivePackages();
+            if (! __isEmpty($superLikeCollection)) {
+                foreach ($superLikeCollection as $package) {
+                    $superLikePackages[] = [
+                        '_id' => $package->_id,
+                        '_uid' => $package->_uid,
+                        'package_name' => $package->title,
+                        'package_type' => 'super_like',
+                        'description' => $package->description,
+                        'total_likes' => (int) $package->total_likes,
+                        'price' => round((float) $package->price, 2),
+                    ];
+                }
             }
         }
 
         return $this->engineReaction(1, [
             'creditWalletData' => [
                 'creditPackages' => $creditPackages,
+                'superLikePackages' => $superLikePackages,
             ],
+            'superLikeBalance' => $this->superLikePackageRepository->getUserBalance($userId),
             'paymentData' => [
                 'currencySymbol' => getStoreSettings('currency_symbol'),
                 'currency' => getStoreSettings('currency'),
@@ -207,6 +243,98 @@ class CreditWalletEngine extends BaseEngine
                 'stripeTestPublishableKey' => getStoreSettings('stripe_testing_publishable_key'),
                 'stripeLivePublishableKey' => getStoreSettings('stripe_live_publishable_key'),
             ],
+        ]);
+    }
+
+    /**
+     * Resolve credit or Super Like package for checkout.
+     *
+     * @param  string  $packageUid
+     * @param  string|null  $packageType
+     * @return array|null
+     */
+    public function resolvePurchasablePackage($packageUid, $packageType = null)
+    {
+        $packageType = $packageType ?: request()->input('package_type');
+
+        if ($packageType === 'super_like') {
+            $package = $this->superLikePackageRepository->fetch($packageUid);
+            if (__isEmpty($package) || (int) $package->status !== 1) {
+                return null;
+            }
+
+            return [
+                'type' => 'super_like',
+                'uid' => $package->_uid,
+                'id' => $package->_id,
+                'title' => $package->title,
+                'price' => (float) $package->price,
+                'total_likes' => (int) $package->total_likes,
+                'credits' => 0,
+                'image' => null,
+                'model' => $package,
+            ];
+        }
+
+        $package = $this->creditPackageRepository->fetch($packageUid);
+        if (! __isEmpty($package)) {
+            return [
+                'type' => 'credit',
+                'uid' => $package->_uid,
+                'id' => $package->_id,
+                'title' => $package->title,
+                'price' => (float) $package->price,
+                'total_likes' => 0,
+                'credits' => (int) $package->credits,
+                'image' => $package->image,
+                'model' => $package,
+            ];
+        }
+
+        // Fallback: try Super Like when type omitted (payment callbacks)
+        $package = $this->superLikePackageRepository->fetch($packageUid);
+        if (! __isEmpty($package) && (int) $package->status === 1) {
+            return [
+                'type' => 'super_like',
+                'uid' => $package->_uid,
+                'id' => $package->_id,
+                'title' => $package->title,
+                'price' => (float) $package->price,
+                'total_likes' => (int) $package->total_likes,
+                'credits' => 0,
+                'image' => null,
+                'model' => $package,
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * After successful payment, grant credits or Super Likes.
+     *
+     * @param  int  $userId
+     * @param  int  $financialTxnId
+     * @param  array  $resolvedPackage
+     * @return bool
+     */
+    public function fulfillPurchasedPackage($userId, $financialTxnId, $resolvedPackage)
+    {
+        if ($resolvedPackage['type'] === 'super_like') {
+            return (bool) $this->superLikePackageRepository->storeWalletTransaction([
+                'status' => 1,
+                'users__id' => $userId,
+                'quantity' => (int) $resolvedPackage['total_likes'],
+                'super_like_packages__id' => $resolvedPackage['id'],
+                'credit_wallet_transactions__id' => null,
+                'description' => 'purchase_paid:' . $resolvedPackage['uid'] . ':ft:' . $financialTxnId,
+            ]);
+        }
+
+        return (bool) $this->creditWalletRepository->storeCredits([
+            'userId' => $userId,
+            'credits' => (int) $resolvedPackage['credits'],
+            'txnId' => $financialTxnId,
         ]);
     }
 
@@ -458,25 +586,83 @@ class CreditWalletEngine extends BaseEngine
     {
         $paymentMethod = $inputData['select_payment_method'];
         $packageUid = $inputData['select_package'];
+        $packageType = isset($inputData['package_type']) ? $inputData['package_type'] : null;
 
-        //get package collection
-        $packageCollection = $this->creditPackageRepository->fetch($packageUid);
+        $resolvedPackage = $this->resolvePurchasablePackage($packageUid, $packageType);
 
         //if it is empty then throw error
-        if ( __isEmpty($packageCollection)) {
+        if (__isEmpty($resolvedPackage)) {
             //success function
             return $this->engineReaction(2, null,  __tr('Package does not exist.'));
         }
 
+        // Block repeat claims for free credit packages across all payment methods.
+        if ($resolvedPackage['type'] === 'credit'
+            && (float) $resolvedPackage['price'] <= 0
+            && $this->creditWalletRepository->hasUserClaimedFreePackage(getUserId(), $packageUid)) {
+            return $this->engineReaction(2, [
+                'errorMessage' => __tr('You have already claimed this free package. Please choose a paid package.'),
+            ], __tr('Already claimed'));
+        }
+
         //check payment method and package data exists
         if ($paymentMethod == 'stripe') {
-            $packageImageFolderPath = getPathByKey('package_image', ['{_uid}' => $packageCollection->_uid]);
-            $packageImageUrl = getMediaUrl($packageImageFolderPath, $packageCollection['image']);
+            // Free packages do not need Stripe Checkout ($0 has no PaymentIntent).
+            if ((float) $resolvedPackage['price'] <= 0) {
+                if ($resolvedPackage['type'] !== 'credit') {
+                    return $this->engineReaction(2, [
+                        'errorMessage' => __tr('Free Super Like packages are not allowed. Please set a price.'),
+                    ], __tr('Invalid package'));
+                }
+
+                $userId = getUserId();
+
+                if ($this->creditWalletRepository->hasUserClaimedFreePackage($userId, $packageUid)) {
+                    return $this->engineReaction(2, [
+                        'errorMessage' => __tr('You have already claimed this free package. Please choose a paid package.'),
+                    ], __tr('Already claimed'));
+                }
+
+                $freePaymentData = [
+                    'id' => $this->creditWalletRepository->getFreePackageTxnId($userId, $packageUid),
+                    'amount' => 0,
+                    'status' => 'succeeded',
+                    'metadata' => [
+                        'userId' => $userId,
+                        'packageUid' => $packageUid,
+                        'packageType' => $resolvedPackage['type'],
+                    ],
+                ];
+
+                if ($this->creditWalletRepository->isAlreadyProcessed($freePaymentData['id'])) {
+                    return $this->engineReaction(2, [
+                        'errorMessage' => __tr('You have already claimed this free package. Please choose a paid package.'),
+                    ], __tr('Already claimed'));
+                }
+
+                $storeResult = $this->storeStripePaymentData($freePaymentData, $packageUid, $resolvedPackage['type']);
+                if ($storeResult['reaction_code'] == 1) {
+                    return $this->engineReaction(1, [
+                        'freePackageGranted' => true,
+                    ], __tr('Credits added successfully'));
+                }
+
+                return $this->engineReaction(2, [
+                    'errorMessage' => $storeResult['message'] ?? __tr('Unable to add free package credits.'),
+                ], __tr('Failed'));
+            }
+
+            $packageImageUrl = '';
+            if ($resolvedPackage['type'] === 'credit' && !__isEmpty($resolvedPackage['image'])) {
+                $packageImageFolderPath = getPathByKey('package_image', ['{_uid}' => $resolvedPackage['uid']]);
+                $packageImageUrl = getMediaUrl($packageImageFolderPath, $resolvedPackage['image']);
+            }
 
             $stripeRequestData = [
                 'packageUid' => $packageUid,
-                'package_name' => $packageCollection['title'],
-                'amount' => $packageCollection['price'],
+                'packageType' => $resolvedPackage['type'],
+                'package_name' => $resolvedPackage['title'],
+                'amount' => $resolvedPackage['price'],
                 'currency' => getStoreSettings('currency'),
                 'packageImageUrl' => $packageImageUrl,
                 'userId'=> getUserId(),
@@ -519,12 +705,25 @@ class CreditWalletEngine extends BaseEngine
         if ($stripePaymentData['reaction_code'] == 1) {
             $stripeData = $stripePaymentData['data']['paymentData'];
 
+            if (empty($stripeData['metadata']['userId'])) {
+                $stripeData['metadata']['userId'] = getUserId();
+            }
+            if (empty($stripeData['metadata']['packageUid']) && ! empty($inputData['packageUid'])) {
+                $stripeData['metadata']['packageUid'] = $inputData['packageUid'];
+            }
+
+            // Paid intents must succeed; free / no_payment_required sessions use synthetic succeeded status.
+            if (! empty($stripeData['status']) && $stripeData['status'] !== 'succeeded') {
+                return $this->engineReaction(2, null,  __tr('Payment Failed'));
+            }
+
             if ($this->creditWalletRepository->isAlreadyProcessed($stripeData['id'])) {
                 return $this->engineReaction(1, null,  __tr('Already been processed'));
             }
 
             //store transaction data
-            if ($this->storeStripePaymentData($stripeData, $inputData['packageUid'])) {
+            $storeResult = $this->storeStripePaymentData($stripeData, $inputData['packageUid'], $inputData['packageType'] ?? ($stripeData['metadata']['packageType'] ?? null));
+            if ($storeResult['reaction_code'] == 1) {
                 return $this->engineReaction(1, null,  __tr('Payment Complete'));
             } else {
                 //payment failed response
@@ -540,14 +739,28 @@ class CreditWalletEngine extends BaseEngine
      *
      * @param  array  $inputData
      *---------------------------------------------------------------- */
-    public function storeStripePaymentData($inputData, $packageUid)
+    public function storeStripePaymentData($inputData, $packageUid, $packageType = null)
     {
-        //get package collection
-        $packageCollection = $this->creditPackageRepository->fetch($packageUid);
+        $resolvedPackage = $this->resolvePurchasablePackage(
+            $packageUid,
+            $packageType ?: array_get($inputData, 'metadata.packageType')
+        );
         //if it is empty then throw error
-        if ( __isEmpty($packageCollection)) {
+        if (__isEmpty($resolvedPackage)) {
             //success function
             return $this->engineReaction(2, null,  __tr('Package does not exist.'));
+        }
+
+        $userId = array_get($inputData, 'metadata.userId', getUserId());
+        $txnId = array_get($inputData, 'id');
+
+        if ($resolvedPackage['type'] === 'credit' && (float) $resolvedPackage['price'] <= 0) {
+            $txnId = $this->creditWalletRepository->getFreePackageTxnId($userId, $packageUid);
+
+            if ($this->creditWalletRepository->hasUserClaimedFreePackage($userId, $packageUid)
+                || $this->creditWalletRepository->isAlreadyProcessed($txnId)) {
+                return $this->engineReaction(2, null, __tr('You have already claimed this free package.'));
+            }
         }
 
         if (! __isEmpty($inputData)) {
@@ -555,23 +768,36 @@ class CreditWalletEngine extends BaseEngine
             if (!getStoreSettings('use_test_stripe')) {
                 $isStripeTestMode = 2;
             }
+
+            // Stripe amount is in cents for paid intents; free packages send amount 0
+            $amount = isset($inputData['amount']) ? ((float) $inputData['amount'] / 100) : $resolvedPackage['price'];
+            if ((float) $resolvedPackage['price'] <= 0) {
+                $amount = 0;
+            }
+
             //collect store data
             $storeData = [
                 'status' => 2,
-                'amount' => $inputData['amount'] / 100,
-                'users__id' => $inputData['metadata']['userId'],
+                'amount' => $amount,
+                'users__id' => $userId,
                 'method' => configItem('payments.payment_methods', 2),
                 'currency_code' => getStoreSettings('currency'),
                 'is_test' => $isStripeTestMode,
-                'txn_id' => array_get($inputData, 'id'),
+                'txn_id' => $txnId,
                 '__data' => [
                     'rawPaymentData' => json_encode($inputData),
-                    'packageName' => $packageCollection['title'],
+                    'packageName' => $resolvedPackage['title'],
+                    'packageUid' => $packageUid,
+                    'packageType' => $resolvedPackage['type'],
                 ],
             ];
-            //store transaction process
-            if ($this->creditWalletRepository->storeTransaction($storeData, $packageCollection)) {
-                //success function
+
+            if ($resolvedPackage['type'] === 'super_like') {
+                $financialTxnId = $this->creditWalletRepository->storeFinancialTransactionOnly($storeData);
+                if ($financialTxnId && $this->fulfillPurchasedPackage($userId, $financialTxnId, $resolvedPackage)) {
+                    return $this->engineReaction(1, null, __tr('Purchase successfully'));
+                }
+            } elseif ($this->creditWalletRepository->storeTransaction($storeData, $resolvedPackage['model'])) {
                 return $this->engineReaction(1, null,  __tr('Purchase successfully'));
             }
         }
@@ -601,7 +827,7 @@ class CreditWalletEngine extends BaseEngine
             //check transaction status is completed or not
             if ($razorpayResponse['captured'] === true) {
                 //store transaction data
-                if ($this->storePaymentData($razorpayResponse, $inputData['packageUid'], 'razorpayPayment')) {
+                if ($this->storePaymentData($razorpayResponse, $inputData['packageUid'], 'razorpayPayment', null, $inputData['packageType'] ?? ($inputData['package_type'] ?? null))) {
                     return $this->engineReaction(1, null,  __tr('Payment Complete'));
                 }
             } else {
@@ -621,13 +847,12 @@ class CreditWalletEngine extends BaseEngine
      *
      * @param  array  $inputData
      *---------------------------------------------------------------- */
-    public function storePaymentData($inputData, $packageUid, $paymentMethod, $userId = null)
+    public function storePaymentData($inputData, $packageUid, $paymentMethod, $userId = null, $packageType = null)
     {
-        //get package collection
-        $packageCollection = $this->creditPackageRepository->fetch($packageUid);
+        $resolvedPackage = $this->resolvePurchasablePackage($packageUid, $packageType);
 
         //if it is empty then throw error
-        if ( __isEmpty($packageCollection)) {
+        if (__isEmpty($resolvedPackage)) {
             //success function
             return $this->engineReaction(2, null,  __tr('Package does not exist.'));
         }
@@ -635,7 +860,7 @@ class CreditWalletEngine extends BaseEngine
         // check if user collection exists
         if (! __isEmpty($inputData)) {
             $isTestMode = 1;
-            $amount = $packageCollection['price'];
+            $amount = $resolvedPackage['price'];
             $currency = getStoreSettings('currency');
             $paymentType = null;
             //collect paypal payment data
@@ -674,12 +899,18 @@ class CreditWalletEngine extends BaseEngine
                 'txn_id' => array_get($inputData, 'id'),
                 '__data' => [
                     'rawPaymentData' => json_encode($inputData),
-                    'packageName' => $packageCollection['title'],
+                    'packageName' => $resolvedPackage['title'],
+                    'packageUid' => $packageUid,
+                    'packageType' => $resolvedPackage['type'],
                 ],
             ];
 
-            //store transaction process
-            if ($financialTransactionId = $this->creditWalletRepository->storeTransaction($storeData, $packageCollection, $userId)) {
+            if ($resolvedPackage['type'] === 'super_like') {
+                $financialTxnId = $this->creditWalletRepository->storeFinancialTransactionOnly($storeData);
+                if ($financialTxnId && $this->fulfillPurchasedPackage($userId, $financialTxnId, $resolvedPackage)) {
+                    return $this->engineReaction(1, null, __tr('Purchase successfully'));
+                }
+            } elseif ($financialTransactionId = $this->creditWalletRepository->storeTransaction($storeData, $resolvedPackage['model'], $userId)) {
                 //fetch updated user total credits by helper function
                 totalUserCredits();
                 //success function
@@ -898,7 +1129,7 @@ class CreditWalletEngine extends BaseEngine
 
             if ($paymentWebhookRazorPayData['captured'] === true) {
                 //store transaction data
-                if ($this->storePaymentData($paymentWebhookRazorPayData, $paymentWebhookRazorPayData['notes']['packageUid'], 'razorpayPayment', $paymentWebhookRazorPayData['notes']['userId'])) {
+                if ($this->storePaymentData($paymentWebhookRazorPayData, $paymentWebhookRazorPayData['notes']['packageUid'], 'razorpayPayment', $paymentWebhookRazorPayData['notes']['userId'], $paymentWebhookRazorPayData['notes']['packageType'] ?? null)) {
                     return $this->engineReaction(1, null,  __tr('Payment Complete'), 200);
                 }
             } else {
@@ -933,9 +1164,10 @@ class CreditWalletEngine extends BaseEngine
      */
     public function prepareOrderProcess($inputData)
     {
-        $packageCollection = $this->creditPackageRepository->fetch($inputData['packageUid']);
+        $packageType = isset($inputData['packageType']) ? $inputData['packageType'] : ($inputData['package_type'] ?? null);
+        $resolvedPackage = $this->resolvePurchasablePackage($inputData['packageUid'], $packageType);
 
-        if ( __isEmpty($packageCollection)) {
+        if (__isEmpty($resolvedPackage)) {
             //success function
             return $this->engineReaction(2, null,  __tr('Package does not exist.'));
         }
@@ -944,6 +1176,9 @@ class CreditWalletEngine extends BaseEngine
         if (!getStoreSettings('use_test_paypal_checkout')) {
             $isPaypalCheckoutTestMode = 2;
         }
+
+        $inputData['packageType'] = $resolvedPackage['type'];
+        $inputData['package_type'] = $resolvedPackage['type'];
 
         $storeData = [
             'status' => 4,
@@ -956,11 +1191,23 @@ class CreditWalletEngine extends BaseEngine
             '__data' => [
                 'rawPaymentData' => json_encode($inputData),
                 'packageName' => $inputData['packageName'],
+                'packageUid' => $resolvedPackage['uid'],
+                'packageType' => $resolvedPackage['type'],
             ],
         ];
 
         //made new function for getting order id
-        if ($orderData = $this->coinGateEngine->storeTransaction($storeData, $packageCollection)) {
+        // For Super Like packages, pass a fake credit model-compatible object isn't needed —
+        // CoinGate/PayPal storeTransaction only needs financial fields; package used for credits later.
+        $packageForStore = $resolvedPackage['type'] === 'credit'
+            ? $resolvedPackage['model']
+            : (object) [
+                'credits' => 0,
+                'title' => $resolvedPackage['title'],
+                '_uid' => $resolvedPackage['uid'],
+            ];
+
+        if ($orderData = $this->coinGateEngine->storeTransaction($storeData, $packageForStore)) {
             //success function
             $paypalResponse = $this->paypalEngine->paypalOrderCreate($inputData, $orderData);
           

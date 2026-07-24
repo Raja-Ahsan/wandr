@@ -244,6 +244,34 @@ class UserRepository extends BaseRepository implements UserRepositoryBlueprint
     }
 
     /**
+     * Check if two users have mutually liked each other.
+     *
+     * @param  int  $userId
+     * @param  int  $otherUserId
+     * @return bool
+     *---------------------------------------------------------------- */
+    public function isMutualLike($userId, $otherUserId)
+    {
+        if (__isEmpty($userId) || __isEmpty($otherUserId) || (int) $userId === (int) $otherUserId) {
+            return false;
+        }
+
+        $iLikedThem = LikeDislikeModal::where('by_users__id', $userId)
+            ->where('to_users__id', $otherUserId)
+            ->where('like', 1)
+            ->exists();
+
+        if (!$iLikedThem) {
+            return false;
+        }
+
+        return LikeDislikeModal::where('by_users__id', $otherUserId)
+            ->where('to_users__id', $userId)
+            ->where('like', 1)
+            ->exists();
+    }
+
+    /**
      * Fetch the record of Block user data
      *
      * @param  int || string $email
@@ -1112,6 +1140,7 @@ class UserRepository extends BaseRepository implements UserRepositoryBlueprint
             'to_users__id',
             'by_users__id',
             'like',
+            'why',
         ];
         // Get Instance of user likes dislikes model
         $likeDislikeModal = new LikeDislikeModal;
@@ -1178,6 +1207,7 @@ class UserRepository extends BaseRepository implements UserRepositoryBlueprint
             'users__id',
             'credits',
             'credit_type',
+            'description',
         ];
 
         $creditWalletTransaction = new CreditWalletTransaction;

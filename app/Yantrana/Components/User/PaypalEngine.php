@@ -233,7 +233,15 @@ class PaypalEngine extends BaseEngine
 
             $data = $financialTransactionCollection->toArray();
             $rawPaymentData = json_decode($data['__data']['rawPaymentData'], true);
-            $packageCollection = $this->creditPackageRepository->fetch($rawPaymentData['packageUid']);
+            $packageUid = $rawPaymentData['packageUid'] ?? null;
+            $packageType = $rawPaymentData['packageType'] ?? ($rawPaymentData['package_type'] ?? ($data['__data']['packageType'] ?? null));
+
+            $creditWalletEngine = app(\App\Yantrana\Components\User\CreditWalletEngine::class);
+            $resolvedPackage = $creditWalletEngine->resolvePurchasablePackage($packageUid, $packageType);
+
+            if (__isEmpty($resolvedPackage)) {
+                return $this->engineReaction(2, null, __tr('Package does not exist.'));
+            }
 
             //collect update data
             $updateData = [
@@ -242,16 +250,20 @@ class PaypalEngine extends BaseEngine
                 '__data' => [
                     'rawPaymentData' => json_encode($capturedPaypalData),
                     'packageName' => $data['__data']['packageName'],
+                    'packageUid' => $resolvedPackage['uid'],
+                    'packageType' => $resolvedPackage['type'],
                 ],
             ];
 
             //update transaction process
             if ($this->financialTransactionRepository->updateIt($financialTransactionCollection, $updateData)) {
-                $this->creditWalletRepository->storeCredits([
-                    'userId' => $financialTransactionCollection['users__id'],
-                    'credits' => $packageCollection->credits,
-                    'txnId' => $financialTransactionCollection->_id
-                ]);
+                if (!$creditWalletEngine->fulfillPurchasedPackage(
+                    $financialTransactionCollection['users__id'],
+                    $financialTransactionCollection->_id,
+                    $resolvedPackage
+                )) {
+                    return $this->engineReaction(2, null, __tr('Purchased failed'));
+                }
                 //success function
                 return $this->engineReaction(1, null, __tr('Purchase successfully'));
             }

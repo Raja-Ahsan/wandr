@@ -17,6 +17,11 @@
 		<a class="lw-ajax-link-action lw-action-with-url" href="<?= route('user.profile_view', ['username' => $user['username']]) ?>">
 			<img data-src="<?= imageOrNoImageAvailable($user['userImageUrl']) ?>" class="lw-user-thumbnail lw-lazy-img" />
 		</a>
+		@if(!empty($user['isSuperLike']))
+		<span class="lw-super-like-badge" title="<?= __tr('Super Like') ?>">
+			<i class="fas fa-star"></i> <?= __tr('Super Like') ?>
+		</span>
+		@endif
 		<div class="card-title">
 			<h5>
 				<a class="text-secondary" href="<?= route('user.profile_view', ['username' => $user['username']]) ?>">

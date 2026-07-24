@@ -434,6 +434,12 @@ Route::group([
                     'uses' => 'UserSettingController@searchStaticCities',
                 ]);
 
+                // Cities for selected country (profile wizard)
+                Route::post('/cities-by-country', [
+                    'as' => 'user.read.cities_by_country',
+                    'uses' => 'UserSettingController@getCitiesByCountry',
+                ]);
+
                 // Process location / maps data
                 Route::post('/store-city', [
                     'as' => 'user.write.store_city',
@@ -763,6 +769,23 @@ Route::group([
                 //     'uses' => 'CreditWalletController@cryptoCheckoutUrl',
                 // ]);
             });
+
+            /*
+            Super Like Packages (user)
+            ----------------------------------------------------------------------- */
+            Route::group([
+                'namespace' => 'SuperLikePackage\Controllers',
+                'prefix' => 'super-likes',
+            ], function () {
+                Route::get('/', [
+                    'as' => 'user.super_like_package.read.shop',
+                    'uses' => 'SuperLikePackageController@shopView',
+                ]);
+                Route::post('/{packageUId}/buy', [
+                    'as' => 'user.super_like_package.write.buy',
+                    'uses' => 'SuperLikePackageController@buyPackage',
+                ]);
+            });
         });
         /*
          * User Section End here
@@ -929,6 +952,39 @@ Route::group([
                 Route::post('/{packageUId}/delete-package', [
                     'as' => 'manage.credit_package.write.delete',
                     'uses' => 'CreditPackageController@processDeletePackage',
+                ]);
+            });
+
+            /*
+            Manage Super Like Package Routes
+            ----------------------------------------------------------------------- */
+            Route::group([
+                'namespace' => 'SuperLikePackage\Controllers',
+                'prefix' => 'manage/super-like-package',
+            ], function () {
+                Route::get('/list', [
+                    'as' => 'manage.super_like_package.read.list',
+                    'uses' => 'ManageSuperLikePackageController@getPackageList',
+                ]);
+                Route::get('/add-package', [
+                    'as' => 'manage.super_like_package.add.view',
+                    'uses' => 'ManageSuperLikePackageController@packageAddView',
+                ]);
+                Route::post('/add-package-process', [
+                    'as' => 'manage.super_like_package.write.add',
+                    'uses' => 'ManageSuperLikePackageController@addPackage',
+                ]);
+                Route::get('/{packageUId}/edit-package', [
+                    'as' => 'manage.super_like_package.edit.view',
+                    'uses' => 'ManageSuperLikePackageController@packageEditView',
+                ]);
+                Route::post('/{packageUId}/edit-package-process', [
+                    'as' => 'manage.super_like_package.write.edit',
+                    'uses' => 'ManageSuperLikePackageController@editPackage',
+                ]);
+                Route::post('/{packageUId}/delete-package', [
+                    'as' => 'manage.super_like_package.write.delete',
+                    'uses' => 'ManageSuperLikePackageController@processDeletePackage',
                 ]);
             });
 

@@ -39,7 +39,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="lwPriceAddon">{{  getCurrencySymbol() }}</span>
                                 </div>
-                                <input type="number" value="<?= $packageEditData['price'] ?>" id="lwPrice" class="form-control" name="price" required digits="true">
+                                <input type="number" value="<?= $packageEditData['price'] ?>" id="lwPrice" class="form-control" name="price" required number="true" min="0" step="0.01">
                                 <div class="input-group-append">
                                     <span class="input-group-text" id="lwPriceAddon">{{  getCurrency() }}</span>
                                 </div>

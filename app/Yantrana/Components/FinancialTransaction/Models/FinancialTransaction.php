@@ -33,6 +33,7 @@ class FinancialTransaction extends BaseModel
         '__data' => [
             'rawPaymentData' => 'array',
             'packageName' => 'string',
+            'packageUid' => 'string',
         ],
     ];
 }

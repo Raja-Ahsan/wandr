@@ -38,7 +38,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="lwPriceAddon">{{  getCurrencySymbol() }}</span>
                                 </div>
-                                <input type="number" class="form-control d-block" name="price" id="lwPrice" required digits="true">
+                                <input type="number" class="form-control d-block" name="price" id="lwPrice" required number="true" min="0" step="0.01">
                                 <div class="input-group-append">
                                     <span class="input-group-text" id="lwPriceAddon">{{  getCurrency() }}</span>
                                 </div>

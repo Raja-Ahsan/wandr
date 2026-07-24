@@ -16,6 +16,7 @@ use App\Yantrana\Components\Media\MediaEngine;
 use App\Yantrana\Components\UserSetting\Models\CityModel;
 use App\Yantrana\Components\UserSetting\Repositories\UserSettingRepository;
 use App\Yantrana\Components\User\CreditWalletEngine;
+use App\Yantrana\Components\User\Models\CreditWalletTransaction;
 use App\Yantrana\Components\User\Repositories\CreditWalletRepository;
 use App\Yantrana\Components\User\Repositories\LoginLogsRepository;
 use App\Yantrana\Components\User\Repositories\UserEncounterRepository;
@@ -1045,6 +1046,7 @@ class UserEngine extends BaseEngine
             'userGiftData' => $userGiftData,
             'userOnlineStatus' => $this->getUserOnlineStatus($user->userAuthorityUpdatedAt),
             'isPremiumUser' => isPremiumUser($userId),
+            'canChatWithUser' => (!$isOwnProfile && $this->userRepository->isMutualLike($loggedInUserId, $userId)),
         ]);
     }
 
@@ -1056,16 +1058,21 @@ class UserEngine extends BaseEngine
      *-----------------------------------------------------------------------*/
     public function processUserLikeDislike($toUserUid, $like, $optionalLoggedInUserId = null)
     {
+        // like = 2 is Super Like (never stored as 2 in DB)
+        if ((int) $like === 2) {
+            return $this->processUserSuperLike($toUserUid, $optionalLoggedInUserId);
+        }
 
         // fetch User by toUserUid
         $user = $this->userRepository->fetch($toUserUid);
-        $blockMeUser = $this->userRepository->fetchBlockMeUser($user->_id);
-        $blockByMeUser = $this->userRepository->fetchBlockByMeUser($user->_id);
         $loginUserID=getUserID();
         // check if user exists
         if (__isEmpty($user)) {
             return $this->engineReaction(2, ['show_message' => true], __tr('User does not exists.'));
         }
+
+        $blockMeUser = $this->userRepository->fetchBlockMeUser($user->_id);
+        $blockByMeUser = $this->userRepository->fetchBlockByMeUser($user->_id);
 
         if(!__isEmpty($blockMeUser) && !__isEmpty($blockMeUser['_id']) )
         {
@@ -1111,8 +1118,11 @@ class UserEngine extends BaseEngine
                 }
             }
 
-            //update data
-            $updateData = ['like' => $like];
+            //update data (normal like/dislike clears super flag)
+            $updateData = [
+                'like' => $like,
+                'why' => null,
+            ];
             //update like dislike
             if ($this->userRepository->updateLikeDislike($likeDislikeData, $updateData)) {
               
@@ -1151,6 +1161,10 @@ class UserEngine extends BaseEngine
                         'likeStatus' => 1,
                         'status' => 'updated',
                         'totalLikes' => fetchTotalUserLikedCount($user->_id),
+                        'isMutualMatch' => $this->userRepository->isMutualLike(
+                            __isEmpty($optionalLoggedInUserId) ? getUserID() : $optionalLoggedInUserId,
+                            $user->_id
+                        ),
                     ], __tr('User liked successfully.'));
                 } else {
                     //activity log message
@@ -1161,6 +1175,7 @@ class UserEngine extends BaseEngine
                         'likeStatus' => 2,
                         'status' => 'updated',
                         'totalLikes' => fetchTotalUserLikedCount($user->_id),
+                        'isMutualMatch' => false,
                     ], __tr('User Disliked successfully.'));
                 }
             }
@@ -1171,6 +1186,7 @@ class UserEngine extends BaseEngine
                 'to_users__id' => $user->_id,
                 'by_users__id' => __isEmpty($optionalLoggedInUserId) ? getUserID() : $optionalLoggedInUserId,
                 'like' => $like,
+                'why' => null,
             ];
             //store like dislike
             if ($this->userRepository->storeLikeDislike($storeData)) {
@@ -1210,6 +1226,10 @@ class UserEngine extends BaseEngine
                         'likeStatus' => 1,
                         'status' => 'created',
                         'totalLikes' => fetchTotalUserLikedCount($user->_id),
+                        'isMutualMatch' => $this->userRepository->isMutualLike(
+                            __isEmpty($optionalLoggedInUserId) ? getUserID() : $optionalLoggedInUserId,
+                            $user->_id
+                        ),
                     ], __tr('User liked successfully.'));
                 } else {
                     //activity log message
@@ -1220,6 +1240,7 @@ class UserEngine extends BaseEngine
                         'likeStatus' => 2,
                         'status' => 'created',
                         'totalLikes' => fetchTotalUserLikedCount($user->_id),
+                        'isMutualMatch' => false,
                     ], __tr('User Disliked successfully.'));
                 }
             }
@@ -1228,6 +1249,187 @@ class UserEngine extends BaseEngine
       
 
         return $this->engineReaction(2, ['show_message' => true], __tr('Something went wrong.'));
+    }
+
+    /**
+     * Process Super Like (package balance).
+     * Stores like=1 with why=super_like. Never refunds on unlike.
+     *
+     * @param  string  $toUserUid
+     * @param  int|null  $optionalLoggedInUserId
+     * @return array
+     *---------------------------------------------------------------- */
+    public function processUserSuperLike($toUserUid, $optionalLoggedInUserId = null)
+    {
+        if ((int) getStoreSettings('enable_super_like') !== 1) {
+            return $this->engineReaction(2, [
+                'show_message' => true,
+                'superLikeDisabled' => true,
+            ], __tr('Super Like is currently disabled.'));
+        }
+
+        $transactionResponse = $this->userRepository->processTransaction(function () use ($toUserUid, $optionalLoggedInUserId) {
+            $user = $this->userRepository->fetch($toUserUid);
+
+            if (__isEmpty($user)) {
+                return $this->userRepository->transactionResponse(2, [
+                    'show_message' => true,
+                ], __tr('User does not exists.'));
+            }
+
+            $byUserId = __isEmpty($optionalLoggedInUserId) ? getUserID() : (int) $optionalLoggedInUserId;
+
+            if ((int) $byUserId === (int) $user->_id) {
+                return $this->userRepository->transactionResponse(2, [
+                    'show_message' => true,
+                ], __tr('You cannot Super Like yourself.'));
+            }
+
+            $blockMeUser = $this->userRepository->fetchBlockMeUser($user->_id);
+            if (!__isEmpty($blockMeUser) && !__isEmpty($blockMeUser['_id'])) {
+                return $this->userRepository->transactionResponse(2, [
+                    'show_message' => true,
+                ], __tr('This action is prohibited for this user.'));
+            }
+
+            $this->userEncounterRepository->deleteOldEncounterUser();
+
+            if (!__isEmpty($optionalLoggedInUserId) and isAdmin()) {
+                $loggedInUser = $this->userRepository->fetch($optionalLoggedInUserId);
+            } else {
+                $loggedInUser = Auth::user();
+            }
+
+            if (__isEmpty($loggedInUser)) {
+                return $this->userRepository->transactionResponse(2, [
+                    'show_message' => true,
+                ], __tr('User does not exists.'));
+            }
+
+            // Serialize Super Likes per sender to prevent double-free / double-charge races
+            \DB::table('users')->where('_id', $byUserId)->lockForUpdate()->first();
+
+            $likeDislikeData = $this->userRepository->fetchLikeDislike($user->_id, $optionalLoggedInUserId);
+
+            // Already Super Liked — no re-charge (anti double-bill)
+            if (!__isEmpty($likeDislikeData)
+                && (int) $likeDislikeData->like === 1
+                && $likeDislikeData->why === 'super_like'
+            ) {
+                return $this->userRepository->transactionResponse(1, [
+                    'show_message' => true,
+                    'likeStatus' => 3,
+                    'status' => 'already',
+                    'isSuperLike' => true,
+                    'totalLikes' => fetchTotalUserLikedCount($user->_id),
+                    'isMutualMatch' => $this->userRepository->isMutualLike($byUserId, $user->_id),
+                    'superLikeQuota' => getSuperLikeQuotaInfo($byUserId),
+                    'creditsRemaining' => (int) CreditWalletTransaction::where('users__id', $byUserId)->sum('credits'),
+                ], __tr('You already Super Liked this user.'));
+            }
+
+            $quota = getSuperLikeQuotaInfo($byUserId);
+            $isAdminFakeBypass = isAdmin() && !__isEmpty($optionalLoggedInUserId);
+
+            // Must have package balance (unless admin fake-user bypass)
+            if (!$isAdminFakeBypass && (int) $quota['balance'] < 1) {
+                return $this->userRepository->transactionResponse(2, [
+                    'show_message' => true,
+                    'insufficientSuperLikes' => true,
+                    'errorType' => 'insufficient_super_likes',
+                    'superLikeQuota' => $quota,
+                    'redirectToSuperLikeShop' => true,
+                ], __tr('No Super Likes left. Please buy a Super Like package.'));
+            }
+
+            // Consume 1 Super Like from package balance
+            if (!$isAdminFakeBypass) {
+                $superLikeRepo = app(\App\Yantrana\Components\SuperLikePackage\Repositories\SuperLikePackageRepository::class);
+                $spent = $superLikeRepo->storeWalletTransaction([
+                    'status' => 1,
+                    'users__id' => $byUserId,
+                    'quantity' => -1,
+                    'description' => 'use:' . $user->_id,
+                ]);
+                if (!$spent) {
+                    return $this->userRepository->transactionResponse(2, [
+                        'show_message' => true,
+                    ], __tr('Failed to use Super Like from your balance.'));
+                }
+            }
+
+            $userFullName = $user->first_name . ' ' . $user->last_name;
+            $loggedInUserFullName = $loggedInUser->first_name . ' ' . $loggedInUser->last_name;
+            $loggedInUserName = $loggedInUser->username;
+            $showLikeNotification = getUserSettings('show_like_notification', $user->_id);
+
+            if (!__isEmpty($likeDislikeData)) {
+                $updated = $this->userRepository->updateLikeDislike($likeDislikeData, [
+                    'like' => 1,
+                    'why' => 'super_like',
+                ]);
+                if (!$updated) {
+                    return $this->userRepository->transactionResponse(2, [
+                        'show_message' => true,
+                    ], __tr('Failed to Super Like user.'));
+                }
+                $status = 'updated';
+            } else {
+                $stored = $this->userRepository->storeLikeDislike([
+                    'status' => 1,
+                    'to_users__id' => $user->_id,
+                    'by_users__id' => $byUserId,
+                    'like' => 1,
+                    'why' => 'super_like',
+                ]);
+                if (!$stored) {
+                    return $this->userRepository->transactionResponse(2, [
+                        'show_message' => true,
+                    ], __tr('Failed to Super Like user.'));
+                }
+                $status = 'created';
+            }
+
+            activityLog($userFullName . ' profile Super Liked.');
+
+            $notificationData = [
+                'message' => 'Super Liked by ' . $loggedInUserFullName,
+                'action' => route('user.profile_view', ['username' => $loggedInUserName]),
+                'isRead' => null,
+                'userId' => $user->_id,
+                'type' => 6, // super like
+                'from_users__id' => $byUserId,
+            ];
+            notificationLog($notificationData);
+
+            if ($showLikeNotification) {
+                PushBroadcast::notifyViaPusher('event.user.notification', [
+                    'type' => 'user-super-like',
+                    'userUid' => $user->_uid,
+                    'subject' => __tr('Super Like'),
+                    'message' => __tr('Super Liked by') . ' ' . $loggedInUserFullName,
+                    'messageType' => 'success',
+                    'showNotification' => getUserSettings('show_like_notification', $user->_id),
+                    'getNotificationList' => getNotificationList($user->_id),
+                ]);
+            }
+
+            $freshQuota = getSuperLikeQuotaInfo($byUserId);
+
+            return $this->userRepository->transactionResponse(1, [
+                'show_message' => true,
+                'likeStatus' => 3,
+                'status' => $status,
+                'isSuperLike' => true,
+                'totalLikes' => fetchTotalUserLikedCount($user->_id),
+                'isMutualMatch' => $this->userRepository->isMutualLike($byUserId, $user->_id),
+                'superLikeQuota' => $freshQuota,
+                'superLikeBalance' => (int) $freshQuota['balance'],
+                'creditsRemaining' => (int) CreditWalletTransaction::where('users__id', $byUserId)->sum('credits'),
+            ], __tr('Super Liked successfully.'));
+        });
+
+        return $this->engineReaction($transactionResponse);
     }
 
     /**
@@ -1346,6 +1548,7 @@ class UserEngine extends BaseEngine
                         '_uid' => $user->userUId,
                         'status' => $user->status,
                         'like' => $user->like,
+                        'isSuperLike' => (isset($user->why) && $user->why === 'super_like'),
                         'created_at' => formatDiffForHumans($user->created_at),
                         'updated_at' => formatDiffForHumans($user->updated_at),
                         'userFullName' => $user->userFullName,
@@ -1407,6 +1610,7 @@ class UserEngine extends BaseEngine
                     '_uid' => $user->userUId,
                     'status' => $user->status,
                     'like' => $user->like,
+                    'isSuperLike' => (isset($user->why) && $user->why === 'super_like'),
                     'created_at' => formatDiffForHumans($user->created_at),
                     'updated_at' => formatDiffForHumans($user->updated_at),
                     'userFullName' => $user->userFullName,

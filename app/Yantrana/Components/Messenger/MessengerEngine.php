@@ -86,6 +86,24 @@ class MessengerEngine extends BaseEngine implements MessengerEngineInterface
     }
 
     /**
+     * Chat is allowed only when both users have mutually liked each other.
+     * Admin fake-user messenger can bypass this check.
+     *
+     * @param  int  $fromUserId
+     * @param  int  $toUserId
+     * @param  int|null  $optionalLoggedInUserId
+     * @return bool
+     *-----------------------------------------------------------------------*/
+    protected function canChatWithUser($fromUserId, $toUserId, $optionalLoggedInUserId = null)
+    {
+        if (!__isEmpty($optionalLoggedInUserId) && isAdmin()) {
+            return true;
+        }
+
+        return $this->userRepository->isMutualLike($fromUserId, $toUserId);
+    }
+
+    /**
      * Prepare Conversation List
      *
      * @return  void
@@ -99,6 +117,16 @@ class MessengerEngine extends BaseEngine implements MessengerEngineInterface
             $userDetails = $this->userRepository->fetchUsersWithProfiles([$optionalLoggedInUserId]);
             if (!__isEmpty($userDetails)) {
                 $userId = $userDetails[0]['user_id'];
+            }
+        }
+
+        // Opening chat with a specific user requires a mutual match
+        if (!__isEmpty($specificUserId) && !is_array($specificUserId)) {
+            if (!$this->canChatWithUser($userId, $specificUserId, $optionalLoggedInUserId)) {
+                return $this->engineReaction(2, [
+                    'show_message' => true,
+                    'chat_locked' => true,
+                ], __tr('Match required to chat. Like each other first to unlock messaging.'));
             }
         }
 
@@ -227,6 +255,14 @@ class MessengerEngine extends BaseEngine implements MessengerEngineInterface
         // Check if user exists
         if (\__isEmpty($userDetails)) {
             return $this->engineReaction(18, null, __tr('User does not exists.'));
+        }
+
+        $fromUserId = __isEmpty($optionalLoggedInUserId) ? getUserID() : $optionalLoggedInUserId;
+        if (!$this->canChatWithUser($fromUserId, $userDetails->_id, $optionalLoggedInUserId)) {
+            return $this->engineReaction(2, [
+                'show_message' => true,
+                'chat_locked' => true,
+            ], __tr('Match required to chat. Like each other first to unlock messaging.'));
         }
 
         // Get profile picture folder path
@@ -436,11 +472,20 @@ class MessengerEngine extends BaseEngine implements MessengerEngineInterface
             $storedChatUids = [];
             $unreadMsgCount=$msgCount='';
             // Check if user exists
-            if (__isEmpty($userId)) {
+            if (__isEmpty($userId) || __isEmpty($userDetails)) {
                 return $this->messengerRepository->transactionResponse(18, [
                     'show_message' => true,
                     'storedData' => $inputData,
                 ], __tr('User does not exists.'));
+            }
+
+            // Mutual match required to send messages (admin fake messenger can bypass)
+            if (!$this->canChatWithUser($loggedInUserId, $userDetails->_id, $optionalLoggedInUserId)) {
+                return $this->messengerRepository->transactionResponse(2, [
+                    'show_message' => true,
+                    'chat_locked' => true,
+                    'storedData' => $inputData,
+                ], __tr('Match required to chat. Like each other first to unlock messaging.'));
             }
 
             // check if messenger type is 2 (File Upload)

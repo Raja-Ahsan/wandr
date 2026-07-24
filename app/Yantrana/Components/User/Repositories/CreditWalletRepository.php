@@ -181,6 +181,45 @@ class CreditWalletRepository extends BaseRepository
     }
 
     /**
+     * Deterministic txn id for one-time free package claims.
+     *
+     * @param  int|string  $userId
+     * @param  string  $packageUid
+     * @return string
+     */
+    public function getFreePackageTxnId($userId, $packageUid)
+    {
+        return 'free_pkg_'.$userId.'_'.$packageUid;
+    }
+
+    /**
+     * Whether the user has already claimed a free (zero-price) package.
+     * Industry rule: one claim per user per free package.
+     *
+     * @param  int|string  $userId
+     * @param  string  $packageUid
+     * @return bool
+     */
+    public function hasUserClaimedFreePackage($userId, $packageUid)
+    {
+        if (__isEmpty($userId) || __isEmpty($packageUid)) {
+            return false;
+        }
+
+        $deterministicTxnId = $this->getFreePackageTxnId($userId, $packageUid);
+
+        return FinancialTransaction::where('users__id', $userId)
+            ->where(function ($query) use ($deterministicTxnId, $packageUid) {
+                $query->where('txn_id', $deterministicTxnId)
+                    ->orWhere(function ($legacyQuery) use ($packageUid) {
+                        $legacyQuery->where('amount', '<=', 0)
+                            ->where('__data', 'like', '%'.$packageUid.'%');
+                    });
+            })
+            ->exists();
+    }
+
+    /**
      * Store new coupon using provided data.
      *
      * @param  array  $inputData
@@ -201,5 +240,31 @@ class CreditWalletRepository extends BaseRepository
         if ($CreditWalletTransaction->assignInputsAndSave([], $keyValues)) {
             return true;
         }
+    }
+
+    /**
+     * Store financial transaction only (used for Super Like money purchases).
+     *
+     * @param  array  $inputData
+     * @return int|false
+     */
+    public function storeFinancialTransactionOnly($inputData)
+    {
+        $keyValues = [
+            'status',
+            'amount',
+            'users__id',
+            'method',
+            'currency_code',
+            'is_test',
+            'txn_id',
+            '__data',
+        ];
+        $financialTransaction = new FinancialTransaction;
+        if ($financialTransaction->assignInputsAndSave($inputData, $keyValues)) {
+            return $financialTransaction->_id;
+        }
+
+        return false;
     }
 }

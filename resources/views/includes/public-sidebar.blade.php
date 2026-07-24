@@ -28,6 +28,13 @@
                 <span class="badge badge-success badge-counter"><?= totalUserCredits() ?></span>
             </a>
         </li>
+        <li class="nav-item d-sm-block d-md-none">
+            <a class="nav-link lw-ajax-link-action lw-action-with-url" href="<?= route('user.credit_wallet.read.view') ?>">
+                <i class="fas fa-star fa-fw mr-2"></i>
+                <span><?= __tr('Super Likes') ?></span>
+                <span class="badge badge-primary badge-counter"><?= (int) (getSuperLikeQuotaInfo()['balance'] ?? 0) ?></span>
+            </a>
+        </li>
 
         <!-- Nav Item - Messages -->
         <li class="nav-item d-sm-block d-md-none">

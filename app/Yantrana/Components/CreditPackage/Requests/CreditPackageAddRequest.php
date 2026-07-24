@@ -36,7 +36,7 @@ class CreditPackageAddRequest extends BaseRequest
                 'max:150',
                 Rule::unique('credit_packages', 'title'),
             ],
-            'price' => 'required|integer',
+            'price' => 'required|numeric|min:0',
             'credits' => 'required|integer',
             'package_image' => 'required',
         ];

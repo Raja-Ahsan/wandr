@@ -64,6 +64,10 @@ class MessengerController extends BaseController
     {
         $processReaction = $this->messengerEngine->prepareConversationList($specificUserId);
 
+        if (($processReaction['reaction_code'] ?? null) != 1) {
+            return $this->processResponse($processReaction, [], [], true);
+        }
+
         return $this->responseAction(
             $this->processResponse($processReaction, [], [], true),
             $this->replaceView('messenger.chat', $processReaction['data'], '#lwMessengerContent')
@@ -79,6 +83,10 @@ class MessengerController extends BaseController
     public function getUserConversation($userId)
     {
         $processReaction = $this->messengerEngine->prepareUserMessage($userId);
+
+        if (($processReaction['reaction_code'] ?? null) != 1) {
+            return $this->processResponse($processReaction, [], [], true);
+        }
 
         return $this->responseAction(
             $this->processResponse($processReaction, [], [], true),

@@ -41,22 +41,34 @@ class FilterController extends BaseController
         $processReaction = $this->filterEngine->processFilterData($request->all());
 
         if ($request->ajax()) {
-            if(!$request->get('page')) {
+            if (!$request->get('page')) {
+                // Filter form submit on Find Matches page → refresh results only
+                $resultsOnly = $request->get('filter_results_only') == '1'
+                    || $request->get('is_advance_filter') == 'yes';
 
-                if($request->get('is_advance_filter') == 'yes') {
+                if ($resultsOnly) {
                     return $this->loadPublicView('filter.find-matches-container', $processReaction['data'], [
-                        'replaceElement' => '#lwFindMatchesContainer'
+                        'replaceElement' => '#lwFindMatchesContainer',
+                        'responseData' => [
+                            'totalCount' => $processReaction['data']['totalCount'] ?? 0,
+                            'hasMorePages' => $processReaction['data']['hasMorePages'] ?? false,
+                            'nextPageUrl' => $processReaction['data']['nextPageUrl'] ?? '',
+                            'filterCount' => $processReaction['data']['filterCount'] ?? 0,
+                            'filterData' => $processReaction['data']['filterData'] ?? [],
+                        ],
                     ]);
                 }
 
+                // Sidebar / direct navigation → full Find Matches page content
                 return $this->loadPublicView('filter.filter', $processReaction['data']);
             }
+
             return $this->responseAction(
                 $this->processResponse($processReaction, [], [], true),
                 $this->replaceView('filter.find-matches', $processReaction['data'])
             );
-        } else {
-            return $this->loadPublicView('filter.filter', $processReaction['data']);
         }
+
+        return $this->loadPublicView('filter.filter', $processReaction['data']);
     }
 }
