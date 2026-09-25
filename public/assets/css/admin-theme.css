@@ -411,7 +411,7 @@
 }
 
 .lw-admin-section .form-control {
-    background: rgba(0, 0, 0, 0.25) !important;
+    background: #16102a !important;
     border: 1px solid var(--wandr-admin-border) !important;
     border-radius: 10px;
     color: var(--wandr-admin-text) !important;
@@ -703,9 +703,7 @@ body.lw-public-admin-mode.lw-admin-section .lw-basic-filter-container .custom-se
 }
 
 body.lw-public-admin-mode.lw-admin-section .lw-premium-user-btn {
-    border-radius: 10px;
-    font-weight: 600;
-    margin-right: 0.5rem;
+    display: none !important;
 }
 
 body.lw-public-admin-mode.lw-admin-section .card {

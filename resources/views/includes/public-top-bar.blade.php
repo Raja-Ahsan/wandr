@@ -94,11 +94,11 @@
             </div>
         </li>
     </ul>
-    <!-- buy premium plans page link -->
+    {{-- Temporarily hidden: Be Premium
     @if(!isPremiumUser())
     <a href="<?= route('user.premium_plan.read.view') ?>" class="btn btn-primary btn-sm lw-ajax-link-action lw-action-with-url lw-premium-user-btn" title="<?= __tr('Be Premium User') ?>"><?= __tr('Be Premium') ?></a>
-    <!-- /buy premium plans page link -->
     @endif
+    --}}
     <!-- Topbar Navbar -->
     <ul class="navbar-nav">
         <li class="nav-item d-none d-sm-none d-md-block">

@@ -183,6 +183,36 @@ a:hover {
     color: hsla(0, 0%, 100%, .86)
 }
 
+/* Keep outline-light readable on hover (white bg needs dark text) */
+.btn.btn-outline-light:hover,
+.btn.btn-outline-light:focus,
+.btn.btn-outline-light:not(:disabled):not(.disabled):active {
+    color: #1a1a1a !important
+}
+
+#lwUseCurrentLocation:focus,
+#lwUseCurrentLocation.focus,
+#lwUseCurrentLocation:focus-visible {
+    outline: none !important;
+    box-shadow: none !important
+}
+
+.lw-wizard-location-actions .btn-outline-light:focus,
+.lw-wizard-location-actions .btn-outline-light.focus,
+.lw-wizard-location-actions .btn-outline-light:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    color: #f8f9fc !important;
+    background-color: transparent !important;
+    border-color: #f8f9fc !important
+}
+
+.lw-wizard-location-actions .btn-outline-light:hover {
+    color: #1a1a1a !important;
+    background-color: #f8f9fc !important;
+    border-color: #f8f9fc !important
+}
+
 .btn.btn-light:hover {
     color: #3a3b45
 }

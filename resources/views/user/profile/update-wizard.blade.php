@@ -133,10 +133,6 @@
 						@php
 							$wizardCountries = $wizardLocationData['countries'] ?? [];
 						@endphp
-						<div class="lw-wizard-info-note">
-							<i class="fas fa-info-circle"></i>
-							<span><?= __tr('No Google API required. Select your country and city, or use your device location.') ?></span>
-						</div>
 						<div class="form-group">
 							<label for="lwWizardCountry"><?= __tr('Country') ?></label>
 							<select id="lwWizardCountry" class="form-control">

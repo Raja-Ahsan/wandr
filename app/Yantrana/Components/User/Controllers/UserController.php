@@ -115,19 +115,27 @@ class UserController extends BaseController
         }
 
         $processReaction = $this->userEngine->userSignUpProcess($request->all());
-        //check reaction code is 1 then redirect to login page
+        // Success: SweetAlert on client, then redirect to login after OK
         if ($processReaction['reaction_code'] === 1) {
-            $profileUserName = getUserAuthInfo('profile.username');
-            return $this->responseAction(
-                $this->processResponse($processReaction, [], [], true),
-                // $this->redirectTo('user.login')
-                $profileUserName ? $this->redirectTo('user.profile_view', ['username' => getUserAuthInfo('profile.username')]) : $this->redirectTo('user.login')
-            );
-        } else {
-            return $this->responseAction(
-                $this->processResponse($processReaction, [], [], true)
-            );
+            if (! isset($processReaction['data']) || ! is_array($processReaction['data'])) {
+                $processReaction['data'] = [];
+            }
+            $processReaction['data']['redirectUrl'] = route('user.login');
+            $processReaction['data']['await_confirm_redirect'] = true;
+
+            $response = $this->processResponse($processReaction, [], [], true);
+            // Suppress global auto-toast so signup page owns the SweetAlert + redirect
+            $payload = $response->getData(true);
+            $payload['hide_message'] = true;
+            if (! isset($payload['message']) && isset($payload['data']['message'])) {
+                $payload['message'] = $payload['data']['message'];
+            }
+            $response->setData($payload);
+
+            return $response;
         }
+
+        return $this->processResponse($processReaction, [], [], true);
     }
 
     /**

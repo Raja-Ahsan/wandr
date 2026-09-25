@@ -2,56 +2,54 @@
 
     'use strict';
     /**
-     * Notification Functions : 11 JAN 2020
+     * Notification Functions — SweetAlert (OK to dismiss)
      * LivelyWorks
      *
      *-------------------------------------------------------- */
-    var notyDefaultOptions = {
-        layout: 'topRight',
-        theme: 'bootstrap-v4',
-        progressBar: true,
-        timeout: 3000
-    };
 
+    function showSwalMessage(message, type) {
+        if (typeof Swal === 'undefined') {
+            if (window.console && console.warn) {
+                console.warn('SweetAlert unavailable:', message);
+            }
+            return;
+        }
+
+        return Swal.fire({
+            icon: type ? type : 'info',
+            text: message || '',
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+    }
 
     /**
     * Show Success Message
     *************************************************/
     window.showSuccessMessage = function (message) {
-        new Noty($.extend({}, notyDefaultOptions, {
-            type: 'success',
-            text: message
-        })).show();
+        return showSwalMessage(message, 'success');
     }
 
     /**
     * Show Error Message
     *************************************************/
     window.showErrorMessage = function (message) {
-        new Noty($.extend({}, notyDefaultOptions, {
-            type: 'error',
-            text: message
-        })).show();
+        return showSwalMessage(message, 'error');
     };
 
     /**
     * Show Info Message
     *************************************************/
     window.showInfoMessage = function (message) {
-        new Noty($.extend({}, notyDefaultOptions, {
-            type: 'info',
-            text: message
-        })).show();
+        return showSwalMessage(message, 'info');
     };
 
     /**
     * Show Warning Message
     *************************************************/
     window.showWarnMessage = function (message) {
-        new Noty($.extend({}, notyDefaultOptions, {
-            type: 'warning',
-            text: message
-        })).show();
+        return showSwalMessage(message, 'warning');
     };
     /**
     * Show confirmation dialog
@@ -97,10 +95,7 @@
     };
 
     window.showAlert = function (message, type) {
-        Swal.fire({
-            icon: type ? type : 'info',
-            text: message
-        })
+        return showSwalMessage(message, type ? type : 'info');
     };
 
 })(window);

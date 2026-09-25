@@ -388,10 +388,33 @@ class ManageUserEngine extends BaseEngine
             'status' => (isset($inputData['status'])
         and $inputData['status'] == 'on') ? 1 : $status,
         ];
+        $previousStatus = (int) $userDetails->status;
         // check if user updated
         if ($this->manageUserRepository->updateUser($userDetails, $updateData)) {
             // Adding activity log for update user
             activityLog($userDetails->first_name.' '.$userDetails->last_name.' user info updated.');
+
+            $newStatus = (int) $updateData['status'];
+            if ($previousStatus !== 1 && $newStatus === 1 && ! __isEmpty($userDetails->email)) {
+                try {
+                    app(\App\Yantrana\Base\BaseMailer::class)->notifyToUser(
+                        __tr('Your __siteName__ account is now active', [
+                            '__siteName__' => getStoreSettings('name'),
+                        ]),
+                        'account.account-approved',
+                        [
+                            'fullName' => trim(($updateData['first_name'] ?? '').' '.($updateData['last_name'] ?? '')),
+                            'userName' => $updateData['username'] ?? $userDetails->username,
+                            'email' => $updateData['email'] ?? $userDetails->email,
+                        ],
+                        $updateData['email'] ?? $userDetails->email
+                    );
+                } catch (\Throwable $e) {
+                    if (config('app.debug', false)) {
+                        \Log::debug('Account approved email failed: '.$e->getMessage());
+                    }
+                }
+            }
 
             return $this->engineReaction(1, ['show_message' => true], __tr('User updated successfully.'));
         }
@@ -825,6 +848,30 @@ class ManageUserEngine extends BaseEngine
 
         if ($profileVerified && ($userDetails->status != 4 || $userActivated)) {
             activityLog($userDetails->first_name.' '.$userDetails->last_name.' user verified.');
+
+            if ($userActivated) {
+                $freshUser = $this->manageUserRepository->fetchUser($userUid);
+                if (! __isEmpty($freshUser) && ! __isEmpty($freshUser->email)) {
+                    try {
+                        app(\App\Yantrana\Base\BaseMailer::class)->notifyToUser(
+                            __tr('Your __siteName__ account is now active', [
+                                '__siteName__' => getStoreSettings('name'),
+                            ]),
+                            'account.account-approved',
+                            [
+                                'fullName' => trim(($freshUser->first_name ?? '').' '.($freshUser->last_name ?? '')),
+                                'userName' => $freshUser->username,
+                                'email' => $freshUser->email,
+                            ],
+                            $freshUser->email
+                        );
+                    } catch (\Throwable $e) {
+                        if (config('app.debug', false)) {
+                            \Log::debug('Account approved email failed: '.$e->getMessage());
+                        }
+                    }
+                }
+            }
 
             $message = $userActivated
                 ? __tr('User verified and activated successfully.')

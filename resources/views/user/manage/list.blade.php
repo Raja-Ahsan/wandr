@@ -145,7 +145,7 @@
 				<?= __tr('Are You Sure!') ?>
 			</h3>
 			<strong>
-				<?= __tr('You want to permanent delete this user.') ?>
+				<?= __tr('You want to permanently delete this user. This action cannot be undone.') ?>
 			</strong>
 		</div>
 		<!-- User Permanent delete Container -->
@@ -207,7 +207,7 @@
 				<% } %>
 				<% if(__tData.status == 5) { %>
 					<!-- Permanent delete button -->
-					<!--{{  <a class="dropdown-item lw-ajax-link-action-via-confirm" data-confirm="#lwUserPermanentDeleteContainer"  data-method="post" data-action="<%= __Utils.apiURL("<?= route('manage.user.write.permanent_delete', ['userUid' => 'userUid']) ?>", {'userUid': __tData._uid}) %>" data-callback="onSuccessAction" href data-method="post"><i class="fas fa-trash-alt"></i> <?= __tr('Delete') ?></a>  }} -->
+					<a class="dropdown-item lw-ajax-link-action-via-confirm text-danger" data-confirm="#lwUserPermanentDeleteContainer" data-method="post" data-action="<%= __Utils.apiURL("<?= route('manage.user.write.permanent_delete', ['userUid' => 'userUid']) ?>", {'userUid': __tData._uid}) %>" data-callback="onSuccessAction" href><i class="fas fa-trash-alt"></i> <?= __tr('Delete Permanently') ?></a>
 					<!-- /Permanent delete button -->
 
 					<!-- Restore button -->

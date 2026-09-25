@@ -93,7 +93,8 @@
 <?= __yesset([
     'dist/css/lw-swal-fix.css',
     'dist/js/lw-ajax-swal.js',
-    'dist/js/common-app*.js'
+    'dist/js/common-app*.js',
+    'dist/js/lw-message-swal.js'
 ], true) ?>
 @if(isLoggedIn())
 <?= __yesset([

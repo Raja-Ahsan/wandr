@@ -28,8 +28,8 @@
 <script src="<?= __yesset('dist/js/vendorlibs-leaflet.js') ?>"></script>
 @lwPushEnd
 
-<?php $latitude = (__ifIsset($userProfileData['latitude'], $userProfileData['latitude'], '21.120779'));
-	$longitude = (__ifIsset($userProfileData['longitude'], $userProfileData['longitude'], '79.0544606'));
+<?php $latitude = (__ifIsset($userProfileData['latitude'], $userProfileData['latitude'], '40.7128'));
+	$longitude = (__ifIsset($userProfileData['longitude'], $userProfileData['longitude'], '-74.0060'));
 ?>
 
 <!-- if user block then don't show profile page content -->

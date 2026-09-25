@@ -2,80 +2,79 @@
 
     'use strict';
     /**
-     * Notification Functions : 11 JAN 2020
+     * Notification Functions — SweetAlert (OK to dismiss)
      * LivelyWorks
      *
      *-------------------------------------------------------- */
-    var notyDefaultOptions = {
-        layout: 'topRight',
-        theme: 'bootstrap-v4',
-        progressBar: true,
-        timeout: 3000,
-        closeWith: ['click'],
-        animation: {
-            open: 'animated bounceInRight', // Animate.css class names
-            close: 'animated bounceOutRight'
+
+    function showSwalMessage(message, type) {
+        if (typeof Swal === 'undefined') {
+            if (window.console && console.warn) {
+                console.warn('SweetAlert unavailable:', message);
+            }
+            return;
         }
-    };
+
+        return Swal.fire({
+            icon: type ? type : 'info',
+            text: message || '',
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+    }
 
     /**
     * Show Message
     *************************************************/
     window.__showMessage = function (message, type, options) {
-        if (!window['mdtoast']) {
-            __Utils.warn('mdtoast not found for showMessage');
-            return '';
-        }
-        if (!options) {
-            var options = {};
-        }
-        var mdToastOptions = $.extend({}, {}, options);;
+        var icon = 'info';
         switch (type) {
             case 'success':
-                mdToastOptions.type = mdtoast.SUCCESS;
+                icon = 'success';
                 break;
             case 'error':
-                mdToastOptions.type = mdtoast.ERROR;
+                icon = 'error';
                 break;
             case 'warning':
-                mdToastOptions.type = mdtoast.WARNING;
+                icon = 'warning';
                 break;
             case 'info':
-                mdToastOptions.type = mdtoast.INFO;
+                icon = 'info';
                 break;
             default:
-                mdtoast(message);
+                icon = 'info';
                 break;
         }
-        mdtoast(message, mdToastOptions);
+        return showSwalMessage(message, icon);
     }
 
     /**
     * Show Success Message
     *************************************************/
     window.showSuccessMessage = function (message) {
-        window.__showMessage(message, 'success');
+        return window.__showMessage(message, 'success');
     }
 
     /*
     * Show Error Message
     *************************************************/
     window.showErrorMessage = function (message) {
-        window.__showMessage(message, 'error');
+        return window.__showMessage(message, 'error');
     };
 
     /*
     * Show Info Message
     *************************************************/
     window.showInfoMessage = function (message) {
-        window.__showMessage(message, 'info');
+        return window.__showMessage(message, 'info');
     };
 
     /*
     * Show Warning Message
     *************************************************/
     window.showWarnMessage = function (message) {
-        window.__showMessage(message, 'warning');
+        return window.__showMessage(message, 'warning');
     };
 
     /*
@@ -119,10 +118,7 @@
     };
 
     window.showAlert = function (message, type) {
-        Swal.fire({
-            icon: type ? type : 'info',
-            text: message
-        })
+        return showSwalMessage(message, type ? type : 'info');
     };
 
 })(window);

@@ -49,9 +49,10 @@
                 icon: 'success',
                 title: title || defaultSuccessTitle,
                 text: message,
-                timer: 2200,
                 showConfirmButton: true,
-                confirmButtonText: 'OK'
+                confirmButtonText: 'OK',
+                allowOutsideClick: false,
+                allowEscapeKey: false
             }));
         },
         error: function (message, title) {

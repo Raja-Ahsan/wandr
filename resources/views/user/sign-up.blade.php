@@ -42,7 +42,8 @@
                                 <!-- /page heading -->
                                 <form class="user lw-ajax-form lw-form" method="post"
                                     action="<?= route('user.sign_up.process') ?>" data-show-processing="true"
-                                    data-secured="true" data-unsecured-fields="first_name,last_name">
+                                    data-secured="true" data-unsecured-fields="first_name,last_name"
+                                    data-callback="onSignUpComplete">
                                     <div class="form-group row">
                                         <!-- First Name -->
                                         <div class="col-sm-6 mb-3 mb-sm-0">
@@ -200,11 +201,62 @@
 @lwPush('appScripts')
 <script>
     var recaptchaInstance = "<?= getStoreSettings('allow_recaptcha') ?>";
-    //on login success callback
-    function onSuccessCallback(response) {
-        if(recaptchaInstance){
-            grecaptcha.reset();
+    var signupLoginUrl = "<?= route('user.login') ?>";
+
+    /**
+     * Signup owns its SweetAlert so OK always redirects to login.
+     */
+    function onSignUpComplete(response) {
+        if (recaptchaInstance && typeof grecaptcha !== 'undefined') {
+            try {
+                grecaptcha.reset();
+            } catch (e) {}
         }
+
+        var isSuccess = response && (parseInt(response.reaction, 10) === 1 || parseInt(response.reaction_code, 10) === 1);
+        if (!isSuccess) {
+            return;
+        }
+
+        var redirectUrl = (response.data && response.data.redirectUrl) ? response.data.redirectUrl : signupLoginUrl;
+        var message = response.message
+            || (response.data && response.data.message)
+            || "<?= __tr('Your account has been created successfully. An admin will review and activate your account. You will be able to log in once it is approved.') ?>";
+
+        function goToLogin() {
+            if (typeof window.__lwForceRedirect === 'function') {
+                window.__lwForceRedirect(redirectUrl);
+            } else {
+                window.open(redirectUrl, '_self');
+            }
+        }
+
+        if (typeof Swal === 'undefined') {
+            alert(message);
+            goToLogin();
+            return;
+        }
+
+        // Close any auto-alert, then show the one we control
+        try {
+            Swal.close();
+        } catch (e) {}
+
+        Swal.fire({
+            icon: 'success',
+            text: message,
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            customClass: {
+                popup: 'lw-swal-popup',
+                title: 'lw-swal-title',
+                htmlContainer: 'lw-swal-text',
+                confirmButton: 'lw-swal-confirm'
+            }
+        }).then(function () {
+            goToLogin();
+        });
     }
 </script>
 @lwPushEnd

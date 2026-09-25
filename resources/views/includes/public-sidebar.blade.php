@@ -76,6 +76,12 @@
                 <span><?= __tr('My Photos') ?></span>
             </a>
         </li>
+        <li class="nav-item <?= in_array(Route::getCurrentRoute()->getName(), ['user.credit_wallet.read.view', 'user.credit_wallet.read.wallet_transaction_list'], true) ? 'active' : '' ?>">
+            <a class="nav-link lw-ajax-link-action lw-action-with-url" href="<?= route('user.credit_wallet.read.view') ?>" data-title="<?= __tr('Wallet') ?>">
+                <i class="fas fa-wallet"></i>
+                <span><?= __tr('Wallet') ?></span>
+            </a>
+        </li>
         <!-- Divider -->
         <hr class="sidebar-divider mt-2 mb-2">
         <li class="nav-item <?= makeLinkActive('user.who_liked_me_view') ?>">

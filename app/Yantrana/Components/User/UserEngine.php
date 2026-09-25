@@ -382,19 +382,24 @@ class UserEngine extends BaseEngine
                     //check activation required for new users
                     if ($activationRequiredForNewUser) {
                         $emailData = [
+                            'fullName' => trim(($newUser->first_name ?? '').' '.($newUser->last_name ?? '')),
                             'userName' => $newUser->username,
                             'email' => $newUser->email,
-                            'expirationTime' => configItem('account.expiry'),
-                            'activation_url' => URL::temporarySignedRoute('user.account.activation', Carbon::now()->addHours(configItem('account.expiry')), ['userUid' => $newUser->_uid]),
                         ];
-                        // check if email send to member
-                        if ($this->baseMailer->notifyToUser(__tr('Verify your email — __siteName__', ['__siteName__' => getStoreSettings('name')]), 'account.activation', $emailData, $newUser->email)) {
+                        // Notify user that account is pending admin approval
+                        if ($this->baseMailer->notifyToUser(
+                            __tr('Your __siteName__ account is pending approval', ['__siteName__' => getStoreSettings('name')]),
+                            'account.pending-approval',
+                            $emailData,
+                            $newUser->email
+                        )) {
                             return $this->userRepository->transactionResponse(1, [
                                 'show_message' => true,
                                 'activation_required' => true,
-                            ], __tr('Your account created successfully, to activate your account please check your email.'));
+                                'redirectUrl' => route('user.login'),
+                            ], __tr('Your account has been created successfully. An admin will review and activate your account. You will be able to log in once it is approved.'));
                         }
-                        return $this->userRepository->transactionResponse(2, ['show_message' => true], __tr('Failed to send activation email, please try again later.'));
+                        return $this->userRepository->transactionResponse(2, ['show_message' => true], __tr('Failed to send account notification email, please try again later.'));
                     } else {
                         $this->userRepository->transactionResponse(1, ['show_message' => true], __tr('Your account created successfully.'));
 
