@@ -397,7 +397,7 @@ class UserEngine extends BaseEngine
                                 'show_message' => true,
                                 'activation_required' => true,
                                 'redirectUrl' => route('user.login'),
-                            ], __tr('Your account has been created successfully. An admin will review and activate your account. You will be able to log in once it is approved.'));
+                            ], __tr('Your account has been created successfully. Admin will review and activate your account. You will receive an email to log in once it is approved.'));
                         }
                         return $this->userRepository->transactionResponse(2, ['show_message' => true], __tr('Failed to send account notification email, please try again later.'));
                     } else {

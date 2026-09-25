@@ -688,7 +688,7 @@ img {
 }
 .social-links {
     justify-content: space-between !important;
-    max-width: 230px;
+    max-width: 92px;
 }
 /* .gradient-img-wrapper::before {
     background: linear-gradient(180deg, rgba(131, 56, 236, 0) 32.69%, #8338EC 100%);

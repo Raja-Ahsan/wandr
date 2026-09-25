@@ -10,11 +10,16 @@
                         To design and scale platforms that simplify how people interact, discover, and transact in everyday life.
                     </p>
                     <ul class="social-links d-flex align-items-center">
-                        <li><a href="" class="social-icon"><i class="fa-brands fa-instagram"></i></a></li>
-                        <li><a href="" class="social-icon"><i class="fa-brands fa-x-twitter"></i></a></li>
-                        <li><a href="" class="social-icon"><i class="fa-brands fa-tiktok"></i></a></li>
-                        <li><a href="" class="social-icon"><i class="fa-brands fa-pinterest-p"></i></a></li>
-                        <li><a href="" class="social-icon"><i class="fa-brands fa-youtube"></i></a></li>
+                        <li>
+                            <a href="https://www.facebook.com/app.wandr" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.instagram.com/app_wandr/" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="col-lg-8">

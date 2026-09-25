@@ -436,11 +436,16 @@ if (! function_exists('getStoreSettings')) {
 
         // Check if request for favicon url
         if ($itemName == 'favicon_image_url') {
-            $faviconName = getStoreSettings('favicon_name');
+            $publicFaviconName = configItem('favicon_name');
+            $publicFaviconPath = public_path('imgs/'.$publicFaviconName);
+            $faviconName = getStoreSettings('favicon_name') ?: $publicFaviconName;
             $faviconFilePath = getPathByKey('favicon').'/'.$faviconName;
-            $faviconImageUrl = getMediaUrl($faviconFilePath) ?: asset('imgs/'.configItem('favicon_name'));
 
-            return $faviconImageUrl.'?ver='.@filemtime($faviconFilePath);
+            if (is_file($faviconFilePath)) {
+                return getMediaUrl($faviconFilePath).'?ver='.@filemtime($faviconFilePath);
+            }
+
+            return asset('imgs/'.$publicFaviconName).'?ver='.@filemtime($publicFaviconPath);
         }
 
         return null;

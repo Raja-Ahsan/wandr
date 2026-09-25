@@ -245,7 +245,7 @@ $techAppConfig = [
 
     /* Define favicon name of application
     ------------------------------------------------------------------------- */
-    'favicon_name' => 'favicon.ico',
+    'favicon_name' => 'fav.png',
 
     /* Default paginate count
     ------------------------------------------------------------------------- */

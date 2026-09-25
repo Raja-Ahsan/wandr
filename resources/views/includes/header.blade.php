@@ -19,8 +19,8 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles:wght@400;700&display=swap" rel="stylesheet">
 	@endif
-	<link rel="shortcut icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/x-icon">
-	<link rel="icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/x-icon">
+	<link rel="shortcut icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/png">
+	<link rel="icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/png">
 	@if(getStoreSettings('allow_recaptcha'))
 	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 	@endif

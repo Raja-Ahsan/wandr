@@ -37,8 +37,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
 
-    <link rel="shortcut icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/x-icon">
-    <link rel="icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/x-icon">
+    <link rel="shortcut icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/png">
+    <link rel="icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/png">
 </head>
 
 <body id="page-top" class="bg-dark lw-login-register-page">

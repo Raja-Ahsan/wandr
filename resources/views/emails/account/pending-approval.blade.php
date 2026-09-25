@@ -22,7 +22,7 @@
                         {{ __tr('Pending admin approval') }}
                     </p>
                     <p style="margin:0;font-size:14px;line-height:1.6;color:#e8dff5;">
-                        {{ __tr('An admin will review and activate your account. You will be able to log in once it is approved.') }}
+                        {{ __tr('Admin will review and activate your account. You will receive an email to log in once it is approved.') }}
                     </p>
                 </td>
             </tr>

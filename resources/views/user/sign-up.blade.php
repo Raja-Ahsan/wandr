@@ -221,7 +221,7 @@
         var redirectUrl = (response.data && response.data.redirectUrl) ? response.data.redirectUrl : signupLoginUrl;
         var message = response.message
             || (response.data && response.data.message)
-            || "<?= __tr('Your account has been created successfully. An admin will review and activate your account. You will be able to log in once it is approved.') ?>";
+            || "<?= __tr('Your account has been created successfully. Admin will review and activate your account. You will receive an email to log in once it is approved.') ?>";
 
         function goToLogin() {
             if (typeof window.__lwForceRedirect === 'function') {

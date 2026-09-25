@@ -31,7 +31,7 @@ return [
                 'key' => 'favicon_name',
                 'data_type' => 1,    // string,
                 'placeholder' => '',
-                'default' => 'favicon.ico',
+                'default' => 'fav.png',
             ],
             'name' => [
                 'key' => 'name',

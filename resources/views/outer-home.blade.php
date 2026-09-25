@@ -37,8 +37,8 @@
 <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Qwigley&display=swap" rel="stylesheet">
 
-    <link rel="shortcut icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/x-icon">
-    <link rel="icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/x-icon">
+    <link rel="shortcut icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/png">
+    <link rel="icon" href="<?= getStoreSettings('favicon_image_url') ?>" type="image/png">
     <style>
         .masthead {
             background: linear-gradient(to bottom, rgba(22, 22, 22, 0.3) 0%, rgba(22, 22, 22, 0.7) 75%, #161616 100%), url(<?= __yesset('imgs/home/random/*.jpg', false, [
