@@ -105,7 +105,7 @@
                                     <hr class="mt-4 mb-3">
                                     <!-- create account button -->
                                     <div class="text-center">
-                                        <p><?= __tr("Don't have a Account? Create one its Free!!") ?></p>
+                                        <p><?= __tr("New to the Platform? Sign Up is FREE!") ?></p>
                                         <a class="btn btn-success btn-lg btn-block-on-mobile" href="<?= route('user.sign_up') ?>"><?= __tr('Create an Account!')  ?></a>
                                     </div>
                                     <!-- / create account button -->
